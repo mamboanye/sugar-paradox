@@ -1,44 +1,51 @@
-# Sugar Paradox Paper 2 -- Reproducible Workspace
+# The Sugar Paradox
 
-National food supply predicts obesity across countries but not within them.
+**National food supply predicts obesity across countries but not within them.**
 
-## Quick Start
-
-```bash
-cd scripts
-bash run_all.sh
-```
-
-Requires `uv` with Python 3.10+. All dependencies are installed inline via `uv run --with`.
-
-## Directory Layout
+## Quick start
 
 ```
-data/
-  raw/          Symlinks to source files (FAOSTAT, NCD-RisC, WDI)
-  derived/      Intermediate panels and result JSONs (created by scripts)
-scripts/
-  01_build_panel.py          Rebuild the 37-country analysis panel
-  02_cross_sectional.py      Cross-sectional correlations, partial r, LOO
-  03_within_country_fe.py    FE family: one-way, TWFE, detrended, FD, LD, CRE
-  04_trend_decomposition.py  Trend R2, FE absorption, SE inflation
-  05_robustness_failure.py   Vegetable oil case study (co-trending diagnosis)
-  06_global_scope.py         Global NCD-RisC trend R2 (all countries)
-  07_gdp_positive_control.py GDP: positive cross-sectional, negative detrended
-  08_cross_country_change.py Initial conditions vs change regressions
-  09_figures.py              6 publication-quality figures
-  10_tables.py               4 tables (descriptives, cascade, robustness, change)
-  run_all.sh                 Single command to run everything
-figures/                     PNG outputs
-tables/                      CSV outputs
+git clone https://github.com/mamboanye/sugar-paradox.git
+cd sugar-paradox
+python run_all.py
 ```
 
-## Data Sources
+Requires [uv](https://docs.astral.sh/uv/). All Python dependencies are installed automatically. Works on macOS, Linux, and Windows.
 
-- FAOSTAT Food Balance Sheets (Africa), downloaded 2024
-- NCD-RisC Lancet 2024: BMI and diabetes age-standardised country estimates
-- World Development Indicators (pre-downloaded panel)
+## What this reproduces
 
-## Key Results
+Every number in the paper traces to one of 11 scripts in `scripts/`. The pipeline:
 
-All standard errors are clustered at the country level. The analysis panel contains 37 SSA countries, 2010-2022, 962 rows (country x year x sex).
+1. Validates the 37-country analysis panel against raw NCD-RisC files
+2. Computes cross-sectional correlations, partial r, leave-one-out, subregion robustness
+3. Runs the within-country specification cascade (FE, TWFE, detrending, FD, LD, CRE)
+4. Decomposes variance (entity FE 95.7%, year FE 3.7%, residual 0.6%)
+5. Runs the soybean oil case study (8 diagnostic tests, all consistent with co-trending)
+6. Tests global scope (98% of 200 countries have linear obesity trends with R2 >= 0.90)
+7. GDP positive control (cross-sectional positive, detrended negative at t = -4.12)
+8. Cross-country change regression (initial obesity t = 3.45, food supply null)
+9. Generates all figures
+10. Generates all tables
+
+## Data
+
+All data are included in `data/raw/`:
+
+| File | Source |
+|------|--------|
+| `FoodBalanceSheets_E_Africa.zip` | [FAOSTAT Food Balance Sheets](https://www.fao.org/faostat/en/#data/FBS) |
+| `NCD_RisC_Lancet_2024_BMI_age_standardised_country.csv` | [NCD-RisC](https://www.ncdrisc.org/) |
+| `NCD_RisC_Lancet_2024_Diabetes_age_standardised_countries.csv` | [NCD-RisC](https://www.ncdrisc.org/) |
+| `wdi_ssa_food_health_panel_2000_2024.csv` | [World Bank WDI](https://databank.worldbank.org/) |
+| `ssa_faostat_ncdrisc_analysis_panel_2010_2022.csv` | Merged panel (37 countries, 962 rows) |
+
+## Outputs
+
+- `data/derived/` -- result JSONs (one per script)
+- `figures/` -- PNGs (6 figures)
+- `tables/` -- CSVs (4 tables)
+- `paper/latex/main.pdf` -- manuscript
+
+## Manuscript
+
+LaTeX source in `paper/latex/`. To recompile: `cd paper/latex && bash build.sh`

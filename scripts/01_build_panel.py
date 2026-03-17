@@ -30,7 +30,7 @@ RAW = ROOT / "data" / "raw"
 DERIVED = ROOT / "data" / "derived"
 DERIVED.mkdir(parents=True, exist_ok=True)
 
-SOURCE_PANEL = ROOT.parent / "data" / "derived" / "ssa_faostat_ncdrisc_analysis_panel_2010_2022.csv"
+SOURCE_PANEL = RAW / "ssa_faostat_ncdrisc_analysis_panel_2010_2022.csv"
 OUTPUT = DERIVED / "analysis_panel.csv"
 VALIDATION_OUTPUT = DERIVED / "panel_validation.json"
 
