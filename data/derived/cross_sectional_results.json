@@ -1,0 +1,34 @@
+{
+  "n_countries": 37,
+  "cross_section_years": [
+    2018,
+    2019,
+    2020
+  ],
+  "raw_bivariate": {
+    "r": 0.677,
+    "p": 0.0
+  },
+  "partial_r_gdp_urban_oil": {
+    "r": 0.496,
+    "p": 0.0018
+  },
+  "partial_r_full_panel_means": {
+    "r": 0.531,
+    "p": 0.0007
+  },
+  "loo": {
+    "min_r": 0.417,
+    "min_country": "MRT",
+    "max_r": 0.625,
+    "max_country": "GMB"
+  },
+  "subregion_partial_r": {
+    "r": 0.632,
+    "p": 0.0
+  },
+  "subregion_gdp_partial_r": {
+    "r": 0.462,
+    "p": 0.004
+  }
+}

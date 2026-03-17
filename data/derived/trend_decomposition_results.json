@@ -1,0 +1,40 @@
+{
+  "country_trend_r2": {
+    "mean": 0.9952,
+    "min": 0.9885,
+    "max": 1.0,
+    "pct_above_90": 100.0,
+    "pct_above_95": 100.0
+  },
+  "pooled_trend_r2": 99.42,
+  "fe_absorption": {
+    "entity_fe_r2_pct": 95.73,
+    "entity_year_fe_r2_pct": 99.43
+  },
+  "se_inflation": {
+    "one_way_fe": {
+      "se_non_clustered": 0.047053,
+      "se_clustered": 0.135772,
+      "inflation_ratio": 2.9
+    },
+    "twfe": {
+      "se_non_clustered": 0.017269,
+      "se_clustered": 0.044931,
+      "inflation_ratio": 2.6
+    },
+    "twfe_bivariate": {
+      "se_non_clustered": 0.01706,
+      "se_clustered": 0.050082,
+      "inflation_ratio": 2.9
+    },
+    "range": {
+      "min": 2.6,
+      "max": 2.9
+    }
+  },
+  "residual_ar1": {
+    "mean": 0.896,
+    "min": 0.107,
+    "max": 1.0
+  }
+}

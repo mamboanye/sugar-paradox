@@ -1,0 +1,65 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{pdflscape}
+\usepackage{hyperref}
+\usepackage[numbers]{natbib}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=blue,
+  pdftitle={The Sugar Paradox: National food supply predicts obesity across countries but not within them},
+  pdfauthor={Blinded for review}
+}
+
+\setstretch{1.1}
+\captionsetup{font=small}
+
+\title{The Sugar Paradox: National food supply predicts obesity across countries but not within them}
+\author{Blinded for review}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Countries that eat more sugar are fatter.
+Across 37 Sub-Saharan African countries, national sugar supply predicts women's obesity at $r = 0.50$ after controlling for income, urbanization, and vegetable oil supply.
+The association survives every cross-sectional stress test: leave-one-out exclusion, subregion fixed effects, rank correlations.
+
+It does not survive following the same countries over time.
+In a 2010--2022 panel, sugar supply is null within countries under six specifications---fixed effects, two-way fixed effects, detrending, first differences, long differences, and correlated random effects---each removing a different class of confounding, all converging on the same answer.
+The null is not about sugar. None of 10 FAOSTAT food groups predicts within-country obesity change. Entity and year fixed effects absorb 99.4\% of obesity variance, leaving 0.6\% for any food variable to explain.
+
+Standard safeguards do not catch this. A soybean oil case study passes cross-sectional tests, one-way fixed effects, and Oster bounds ($\delta = 17.6$), yet its lead-lag ratio is 0.99---pure co-trending with no temporal direction. The problem is global: 98\% of 200 countries show linear obesity trends ($R^2 \geq 0.90$).
+
+The only predictor of which countries gained more obesity is how much they had to start with ($t = 3.45$). Cross-sectional associations between food supply and obesity---including those cited in support of sugar-sweetened beverage taxes---identify shared development trends, not dietary effects.
+\end{abstract}
+
+\input{sections/introduction}
+\input{sections/data}
+\input{sections/paradox}
+\input{sections/diagnosis}
+\input{sections/global}
+\input{sections/predictors}
+\input{sections/discussion}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

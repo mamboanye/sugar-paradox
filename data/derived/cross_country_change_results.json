@@ -1,0 +1,38 @@
+{
+  "multiple_regression": {
+    "n_countries": 37,
+    "period": "2010-2020",
+    "r_squared": 0.405,
+    "d_urban": {
+      "beta": 0.1536,
+      "t": 1.73,
+      "p": 0.0936
+    },
+    "d_sugar": {
+      "beta": -0.0017,
+      "t": -0.22,
+      "p": 0.8302
+    },
+    "d_oil": {
+      "beta": -0.0076,
+      "t": -1.84,
+      "p": 0.0752
+    },
+    "d_gdp": {
+      "beta": 0.7697,
+      "t": 0.46,
+      "p": 0.6522
+    },
+    "init_obesity": {
+      "beta": 0.1202,
+      "t": 3.45,
+      "p": 0.0016
+    }
+  },
+  "divergence": {
+    "all_gained": true,
+    "mean_change_pp": 4.94,
+    "min_change_pp": 1.44,
+    "max_change_pp": 9.37
+  }
+}

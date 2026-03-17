@@ -1,0 +1,45 @@
+\section{The Problem Is Global and Affects Published Results}
+
+\subsection{Global Scope of Trend Domination}
+
+The paradox documented in Sections 3--4 uses 37 Sub-Saharan African countries. Is trend domination specific to this region? We test this by fitting country-specific linear trends to women's obesity prevalence for all 200 countries in the NCD-RisC database (2010--2021).
+
+Of 200 countries, 196 (98.0\%) have linear trend $R^2 \geq 0.90$. The median is 0.999; the mean is 0.988. Only four countries fall below 0.90: Switzerland (0.03, a plateau), Venezuela (0.80, an economic crisis), Austria (0.83), and Lithuania (0.86). Figure~\ref{fig:global_trend} shows the distribution.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/fig3_global_trend_r2.png}
+\caption{Distribution of country-specific linear trend $R^2$ for women's obesity, 2010--2021, across 200 countries. 98\% have $R^2 \geq 0.90$, confirming that trend domination is global.}
+\label{fig:global_trend}
+\end{figure}
+
+This near-universal linearity means that any variable trending upward over the same period will correlate with obesity cross-sectionally, regardless of whether it has a causal relationship. The mechanism generating the sugar paradox in SSA operates worldwide.
+
+\subsection{Implications for Basu et al.\ (2013)}
+
+Basu et al.\ \cite{basu2013} applied generalized estimating equations to repeated cross-sections in 175 countries and argued that sugar availability independently predicted diabetes prevalence after controlling for income, urbanization, aging, and other food categories. A companion analysis \cite{basu2013ajph} linked soft drink consumption to overweight across 75 countries, a finding cited over 500 times and invoked in WHO guidance on sugar-sweetened beverage taxation \cite{who2023ssb}. That study is not a panel analysis. It uses one observation per country: soft drink consumption averaged over 1997--2007, outcome data from a single year. There is no time dimension, no country fixed effects, no within-country identification. The entire analysis is between-country by design.
+
+Our results show why this matters. Between-country comparisons conflate the effect of sugar with the effect of correlated country-level characteristics---economic development, food system structure, urbanization trajectories---that independently predict obesity and diabetes. Both Basu studies controlled for income and urbanization levels, but level controls do not remove the shared upward trends that drive both sugar availability and obesity over time. The correlated random effects decomposition (Section 3.2) confirms that the entire sugar-obesity association is between-country. The Basu studies measured the development gradient, not a dietary effect.
+
+\subsection{The One-Way Fixed Effects Trap}
+
+Country fixed effects absorb time-invariant between-country differences, but they are not sufficient. Without year fixed effects, the model captures both genuine within-country variation and the shared upward trend common to all countries. Lin, Teymourian, and Tursini \cite{lin2018} illustrate the trap. They regressed average BMI on sugar and processed food imports across 172 countries (1995--2010) with country fixed effects and clustered standard errors but no year fixed effects. They reported a significant positive association ($p < 0.01$), but the coefficient is substantively empty: 0.004 BMI per 10\% increase in sugar imports means a 250\% increase would shift average BMI by 0.1 points. Their specification is exactly the one that captures co-trending: with 172 countries over 16 years, the shared global rise in both BMI and food imports provides statistical power for a spurious signal that year fixed effects would absorb.
+
+The soybean oil case study (Section 4.4) shows this trap in our data. Soybean oil is significant under one-way country FE ($t_{\text{cl}} = 2.09$) but null under two-way FE ($t_{\text{cl}} = 0.70$). The co-trending signal that disappears when year effects are absorbed is exactly the signal that one-way FE captures.
+
+In our SSA data, sugar is null under every within-country specification, including the most generous: non-clustered standard errors, one-way country fixed effects, no additional controls ($t = 0.66$, $p = 0.51$). Even this maximally favorable specification yields a null result. There is nothing for year effects to absorb because the sugar-obesity association is entirely between-country.
+
+The combination of one-way FE and non-clustered standard errors compounds the problem. Clustering inflates standard errors by 2.6$\times$ to 2.9$\times$ for sugar specifications in our data \cite{bertrand2004, abadie2023}. Effects that appear significant with non-clustered errors in a country-level panel may not survive appropriate clustering.
+
+\subsection{The GDP Positive Control}
+
+To confirm that our methodology can detect real within-country associations, we apply the same specification cascade to GDP per capita. GDP correlates positively with obesity cross-sectionally ($r = 0.73$, $p < 0.001$). Under two-way fixed effects, the coefficient is null ($t_{\text{cl}} = -0.28$). Under entity-specific detrending, GDP is significantly negative: $\hat{\beta} = -1.10$, $t_{\text{cl}} = -4.12$.
+
+The sign reversal is meaningful. Cross-sectionally, richer countries have higher obesity. Within countries, after removing each country's linear trend, years of faster GDP growth correspond to slightly slower obesity growth. This detrended relationship is the only food or economic variable to achieve significance in our panel ($t = -4.12$). It confirms two things: the methodology has power to detect within-country associations when they exist, and the null for food supply variables is not a power artifact.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig5_gdp_control.png}
+\caption{GDP per capita as positive control. Cross-sectional: $r = 0.73$ (positive). Detrended: $r = -0.35$, $t_{\text{cl}} = -4.12$ (negative). The sign reversal confirms the method detects real within-country associations. Food supply variables show nothing at any specification.}
+\label{fig:gdp_control}
+\end{figure}

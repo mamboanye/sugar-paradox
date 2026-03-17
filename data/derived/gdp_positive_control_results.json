@@ -1,0 +1,24 @@
+{
+  "cross_sectional": {
+    "r": 0.728,
+    "p": 0.0
+  },
+  "twfe": {
+    "beta": -0.5619,
+    "t_cl": -0.28
+  },
+  "detrended": {
+    "beta": -1.1,
+    "t_cl": -4.12
+  },
+  "first_differences": {
+    "r": -0.083,
+    "p": 0.0791
+  },
+  "summary": {
+    "cross_sectional_sign": "positive",
+    "twfe_sign": "null",
+    "detrended_sign": "negative",
+    "interpretation": "GDP shows the classic pattern of a real confounder: positive cross-sectionally, null with TWFE, negative when detrended. Food supply variables show nothing at any specification."
+  }
+}

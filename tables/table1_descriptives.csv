@@ -1,0 +1,10 @@
+Variable,N,Mean,SD,Min,Max
+Obesity prevalence (%) -- Women,481,17.09,9.96,2.12,47.35
+Obesity prevalence (%) -- Men,481,6.16,3.74,0.57,20.58
+Diabetes prevalence (%) -- Women,481,10.12,3.87,4.21,25.57
+Diabetes prevalence (%) -- Men,481,9.15,3.82,4.1,23.44
+Sugar supply (kcal/cap/day),481,163.76,107.46,20.49,526.78
+Sugar raw equiv. (kcal/cap/day),481,152.69,98.91,9.44,499.15
+Vegetable oils (kcal/cap/day),481,233.26,107.85,16.27,564.16
+GDP per capita (2015 USD),481,2428.7,3088.15,400.62,19481.65
+Urban population (%),481,43.54,16.9,15.48,91.22

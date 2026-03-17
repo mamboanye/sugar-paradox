@@ -1,0 +1,74 @@
+\section{Diagnosis}
+
+The cross-sectional association is too strong and too stable to be noise, yet within-country evidence is too consistently null to be a power problem. This section diagnoses four structural features of the data that produce the paradox, then illustrates all four with a case study.
+
+\subsection{Trend Domination}
+
+Obesity trends in SSA are near-linear and account for almost all variation. Within each country, the mean linear trend $R^2$ is 0.995. A pooled regression of women's obesity on country indicators and a common linear time trend yields $R^2 = 99.4\%$. These trends persist in countries where sugar supply rose, fell, or remained flat. Food supply does not explain them. The result is the spurious regression problem identified by Granger and Newbold \cite{granger1974} in time series and extended to panel data by Kao \cite{kao1999}: trending series correlate mechanically, regardless of causal connection.
+
+Entity fixed effects alone absorb 95.7\% of obesity variance by removing between-country level differences. Year fixed effects absorb an additional 3.7\%, capturing the shared upward trend. Together they explain 99.4\%, leaving 0.6\% for any food supply variable to predict. This residual is tiny, dominated by measurement error and short-run deviations from trend.
+
+Figure~\ref{fig:variance_decomp} shows the decomposition.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/fig6_variance_decomposition.png}
+\caption{Variance decomposition of women's obesity prevalence. Entity fixed effects absorb 95.7\% and year fixed effects 3.7\%. Food supply variables compete in the remaining 0.6\%.}
+\label{fig:variance_decomp}
+\end{figure}
+
+The near-linear trend has a second consequence for cross-sectional inference. Comparisons across countries at a point in time conflate two sources of variation: persistent between-country differences (which drive the level ordering) and the shared upward trend (which widens the gaps over time). Countries with higher sugar supply also tend to be more economically developed, more urbanized, and further along the nutrition transition \cite{popkin2012}. These characteristics independently predict obesity through level differences that fixed effects absorb.
+
+\subsection{Standard Error Inflation}
+
+Country-level clustering inflates standard errors by a factor of 2.6$\times$ to 2.9$\times$ across sugar specifications. Without clustering, the one-way FE sugar coefficient has $t = 0.73$; with clustering, $t = 0.25$. The inflation arises because within-country observations are serially correlated: the mean first-order autocorrelation of panel residuals is 0.90. Non-clustered standard errors treat these correlated observations as independent, inflating t-statistics by a factor of roughly three.
+
+This inflation matters because published studies that report non-clustered standard errors in country-level panels will overstate significance by the same factor. A coefficient that appears significant at $t = 2.0$ with non-clustered errors would require $t = 5$ to $6$ to survive clustering. Bertrand, Duflo, and Mullainathan \cite{bertrand2004} demonstrated this problem two decades ago for differences-in-differences designs, and Abadie et al.\ \cite{abadie2023} formalized when clustering adjustments are necessary. The problem applies with equal force to country-level food supply panels. Standard error inflation does not explain the paradox (the coefficient itself is null), but it explains how weak signals can appear significant in models with insufficient clustering.
+
+\subsection{NCD-RisC Smoothing}
+
+The NCD-RisC obesity estimates come from a Bayesian hierarchical model that pools population-representative surveys \cite{ncdrisc2024bmi}. The model imposes smooth temporal trajectories and partial pooling across countries and regions.
+
+This smoothing has two consequences. First, it compresses within-country variation. Annual deviations from trend are smaller in the NCD-RisC estimates than they would be in raw survey data, reducing the signal available for within-country regression. Second, partial pooling means each country's estimate borrows information from regional neighbors, potentially introducing spatial correlation absent from the underlying data.
+
+We note this as a limitation rather than a correction. NCD-RisC data are the standard outcome measure in global obesity research; any finding using these data faces the same constraint. The relevant question is whether our null reflects genuine absence of association or insufficient variation after smoothing. The consistency of the null across six specifications argues for the former. Long differences, which compare only the 2010 and 2020 endpoints and do not depend on year-to-year variation, yield $r = -0.19$ (null). If sugar supply had a real within-country effect large enough to matter for policy, it should survive at least one of these approaches.
+
+\subsection{The Soybean Oil Case Study}
+
+Soybean oil supply provides a clean demonstration of how co-trending generates the paradox. No one would argue that soybean oil supply causes obesity in Sub-Saharan Africa, yet the variable passes the same tests sugar passes. Table~\ref{tab:soybean} reports eight diagnostic tests.
+
+\begin{table}[htbp]
+\centering
+\caption{Soybean oil case study: diagnostic test battery. The variable passes cross-sectional and one-way FE tests but fails every trend-removal diagnostic, consistent with pure co-trending.}
+\label{tab:soybean}
+\small
+\begin{tabular}{lrl}
+\toprule
+Test & Statistic & Verdict \\
+\midrule
+Cross-sectional $r$ & 0.362 & significant ($p = 0.028$) \\
+Country FE $t_{\text{cl}}$ & 2.09 & significant \\
+Two-way FE $t_{\text{cl}}$ & 0.70 & null \\
+Lead-lag ratio & 0.99 & co-trending \\
+Detrended $t_{\text{cl}}$ & 1.62 & null \\
+First differences $r$ & 0.035 & null \\
+Granger $r$ & 0.053 & null \\
+Oster $\delta$ & 17.6 & misleading \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Soybean oil passes the two tests most commonly used in the literature. Cross-sectionally, $r = 0.36$ ($p = 0.028$). Under one-way country fixed effects, $t_{\text{cl}} = 2.09$. A researcher using these two approaches would conclude that soybean oil supply predicts obesity.
+
+Six tests tell a different story. Two-way fixed effects reduce the coefficient to null ($t_{\text{cl}} = 0.70$). The lead-lag ratio, comparing coefficients on lead and lag of soybean oil, is 0.99. A causal variable would produce a lead coefficient smaller than the lag (the cause precedes the effect); a ratio near 1.0 indicates pure co-trending with no temporal direction. Detrending yields $t_{\text{cl}} = 1.62$ (null). First differences yield $r = 0.035$ (null). Granger causality yields $r = 0.053$ (null).
+
+The Oster bounds $\delta$ illustrates a separate failure mode. Oster's method \cite{oster2019} asks how large unobserved confounding would need to be, relative to observed confounding, to explain away a coefficient. Soybean oil's $\delta = 17.6$ would normally indicate strong robustness to confounding. Here it is misleading: the $R^2$ jump from bivariate (0.12) to country FE (0.96) comes from fixed effects absorbing level differences, not from soybean oil genuinely predicting obesity. The $\delta$ is high because the wrong variation is being compared.
+
+The case study matters because it is not an analogy. Soybean oil passes the same tests sugar passes: significant cross-sectional correlation, significant one-way FE, large Oster $\delta$. The tests that distinguish co-trending from causation (two-way FE, detrending, first differences, lead-lag, Granger) all reject. Standard approaches to food-supply-obesity association cannot distinguish co-trending from causal relationships.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig4_soybean_oil_case.png}
+\caption{Soybean oil case study: standard tests vs.\ trend diagnostics. The variable passes cross-sectional ($r = 0.36$) and one-way FE ($t_{\text{cl}} = 2.09$) tests but fails every trend-removal diagnostic. Lead-lag ratio of 0.99 confirms pure co-trending. Oster $\delta = 17.6$ is misleading (see text).}
+\label{fig:soybean}
+\end{figure}

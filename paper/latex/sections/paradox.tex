@@ -1,0 +1,58 @@
+\section{The Paradox Documented}
+
+\subsection{Cross-Sectional Evidence}
+
+Sugar supply predicts obesity across countries. Using 2018--2020 country means for women, the bivariate correlation between sugar supply and obesity prevalence is $r = 0.68$ ($p < 0.001$, $N = 37$). Controlling for GDP per capita, urbanization, and vegetable oil supply, the partial correlation remains $r = 0.50$ ($p = 0.002$). Figure~\ref{fig:cross_sectional} shows both relationships.
+
+The association is robust to standard cross-sectional stress tests. Leave-one-out analysis yields partial correlations ranging from 0.42 (dropping Mauritania) to 0.63 (dropping Gambia), with no single country driving the result. Adding subregion fixed effects strengthens the partial correlation to $r = 0.63$ ($p < 0.001$). Adding both subregion and GDP controls gives $r = 0.46$ ($p = 0.004$). Replacing Pearson with Spearman rank correlations preserves the pattern. By every conventional cross-sectional criterion, sugar supply is a strong, stable predictor of obesity.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig1_cross_sectional.png}
+\caption{Cross-sectional association between sugar supply and women's obesity, 2018--2020 country means. Left: bivariate ($r = 0.68$). Right: partial correlation after controlling for GDP, urbanization, and vegetable oil supply ($r = 0.50$, $p = 0.002$).}
+\label{fig:cross_sectional}
+\end{figure}
+
+\subsection{Within-Country Evidence}
+
+The cross-sectional association vanishes when we follow the same countries over time. Table~\ref{tab:fe_cascade} reports the sugar coefficient under progressively demanding specifications, all with standard errors clustered at the country level \cite{bertrand2004}.
+
+\begin{table}[htbp]
+\centering
+\caption{Sugar supply coefficient across specifications, controlling for vegetable oil supply. Dependent variable: women's obesity prevalence (\%). Standard errors clustered by country for FE specifications ($N_{\text{clusters}} = 37$, $N_{\text{obs}} = 481$).}
+\label{tab:fe_cascade}
+\small
+\begin{tabular}{lccccc}
+\toprule
+Specification & $\hat{\beta}_{\text{sugar}}$ & SE & $t$ & $p$ & $R^2$ \\
+\midrule
+Pooled OLS & 0.630 & 0.032 & 19.84 & $< 0.001$ & 0.49 \\
+Country FE & 0.035 & 0.136 & 0.25 & 0.80 & 0.96 \\
+Two-way FE & $-0.029$ & 0.045 & $-0.64$ & 0.52 & 0.99 \\
+Detrended & $-0.001$ & 0.006 & $-0.13$ & 0.90 & 0.01 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Pooled OLS, which mixes between-country and within-country variation, yields a strong sugar coefficient ($t = 19.84$). Adding country fixed effects absorbs the between-country signal and the coefficient drops to $t = 0.25$. Adding year fixed effects drops it further to $t = -0.64$. Entity-specific linear detrending, which removes each country's individual trajectory, yields $t = -0.13$.
+
+Three additional specifications confirm the null. First differences correlate annual changes in sugar with annual changes in obesity: $r = -0.03$ ($p = 0.59$, $N = 444$). Long differences, comparing only the 2010 and 2020 endpoints, yield $r = -0.19$ ($p = 0.25$, $N = 37$). Because long differences do not depend on year-to-year variation, they resist the NCD-RisC smoothing discussed in Section 4.
+
+A Mundlak correlated random effects model \cite{mundlak1978} makes the between-within decomposition explicit. The model includes both time-varying sugar supply and its country mean as regressors, so the coefficients on each cleanly estimate within-country and between-country associations. The within-country sugar coefficient is $t = -0.66$; the between-country coefficient is $t = 3.46$. The entire cross-sectional association comes from between-country variation. Within countries, sugar supply and obesity are unrelated.
+
+Figure~\ref{fig:fe_cascade} visualizes the specification cascade.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{figures/fig2_fe_cascade.png}
+\caption{Sugar supply coefficient under progressively demanding specifications. The coefficient drops from strongly positive (pooled OLS) to null once within-country variation is isolated.}
+\label{fig:fe_cascade}
+\end{figure}
+
+\subsection{Generality Beyond Sugar}
+
+The null is not specific to sugar. We tested all 10 FAOSTAT food groups individually under two-way fixed effects with country-clustered standard errors. None predicts within-country obesity. Cereals, the largest caloric contributor, yield $t = -0.72$. Vegetable oils yield $t = -1.20$. Meat yields $t = -0.50$. Starchy roots yield $t = 0.51$. The pattern is uniform: once country and year effects are absorbed, no food supply variable has enough remaining variation to predict obesity.
+
+This uniformity points to a structural explanation. Entity and year fixed effects absorb 99.4\% of obesity variance. The residual 0.6\% is too small and too noisy for any food supply variable to predict, regardless of whether that variable has a genuine causal relationship with obesity at the individual level.
+
+In exploratory analysis of 15 dietary intake variables from the Global Burden of Disease 2021 study (fruits, vegetables, legumes, whole grains, nuts, red meat, processed meat, sugar-sweetened beverages, sodium, fiber, calcium, omega-3, polyunsaturated fat, trans fat, and milk), the same pattern held: cross-sectional correlations collapsed under fixed effects. These GBD estimates combine survey data with food supply proxies \cite{gbd2019}, so they are not independent of the FAOSTAT measurement issues we discuss in Section 7. The pattern is consistent with the structural explanation, though we present the GBD results as suggestive rather than definitive.

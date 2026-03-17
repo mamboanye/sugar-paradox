@@ -1,0 +1,28 @@
+{
+  "obesity_women": {
+    "n_countries": 200,
+    "mean_r2": 0.9882,
+    "median_r2": 0.9987,
+    "min_r2": 0.0262,
+    "max_r2": 1.0,
+    "pct_above_90": 98.0,
+    "pct_above_95": 97.5,
+    "pct_above_99": 88.5,
+    "countries_below_90": {
+      "CHE": 0.0262,
+      "VEN": 0.7985,
+      "AUT": 0.833,
+      "LTU": 0.8641
+    }
+  },
+  "diabetes_women": {
+    "n_countries": 200,
+    "mean_r2": 0.9269,
+    "pct_above_90": 85.0
+  },
+  "claim_verification": {
+    "claim": "98% of countries globally have trend R2 >= 0.90",
+    "observed_pct": 98.0,
+    "verified": true
+  }
+}

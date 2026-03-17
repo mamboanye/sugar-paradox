@@ -1,0 +1,44 @@
+\section{Data and Panel Construction}
+
+\subsection{Sources}
+
+We construct a country-year-sex panel for 37 Sub-Saharan African countries from 2010 through 2022, combining three data sources.
+
+\textbf{Food supply.} FAOSTAT Food Balance Sheets \cite{faostat2024} provide national food supply in kilocalories per capita per day for 10 food groups: cereals, sugar \& sweeteners, vegetable oils, meat, milk, fruits, vegetables, starchy roots, pulses, and animal fats. The primary exposure variable is sugar \& sweeteners supply (mean 164 kcal/cap/day, SD 107). We also examine vegetable oils (mean 233, SD 108) and all remaining food groups in robustness analyses. Soybean oil supply, used in the case study of Section 4, comes from the same FAOSTAT release.
+
+\textbf{Health outcomes.} NCD-RisC Lancet 2024 estimates \cite{ncdrisc2024bmi} provide age-standardized adult obesity prevalence (BMI $\geq$ 30) for each country-year-sex cell. Women's mean obesity prevalence is 17.1\% (SD 10.0); men's is 6.2\%. We also examine diabetes prevalence from the companion NCD-RisC release \cite{ncdrisc2024diabetes} (women's mean 10.1\%, men's 9.2\%). These estimates come from a Bayesian hierarchical model that pools population-representative surveys, producing smooth temporal trajectories that we return to in Section 4.
+
+\textbf{Covariates.} GDP per capita in constant 2015 US dollars (mean \$2,429, SD \$3,088) and urban population share (mean 43.5\%, SD 16.9) come from the World Development Indicators \cite{wdi2024}.
+
+\subsection{Panel Structure}
+
+The panel contains 962 observations: 37 countries $\times$ 13 years $\times$ 2 sexes, with no missing cells. All obesity and diabetes values validate exactly against the raw NCD-RisC files (zero mismatches across 962 checked values). The 37-country boundary is structural: 11 SSA countries are absent from the comparable FAOSTAT Food Balances (2010--) release and cannot be recovered without breaking cross-country comparability. This boundary is a design restriction, not a data-repair problem.
+
+\subsection{Cross-Sectional Specification}
+
+Analyses that require a single cross-section (partial correlations, leave-one-out tests, subregion comparisons) average each variable over 2018--2020 to reduce year-specific noise while staying within the panel period. All cross-sectional analyses throughout the paper use this same time window for internal consistency.
+
+\subsection{Descriptive Summary}
+
+Table~\ref{tab:descriptives} reports summary statistics for the women's panel ($N = 481$). All within-country regression results reported in subsequent sections use women's data unless otherwise noted.
+
+\begin{table}[htbp]
+\centering
+\caption{Summary statistics for the 37-country, 2010--2022 analysis panel (women only, $N = 481$).}
+\label{tab:descriptives}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Variable & $N$ & Mean & SD & Min & Max \\
+\midrule
+Obesity prevalence (\%) & 481 & 17.09 & 9.96 & 2.12 & 47.35 \\
+Diabetes prevalence (\%) & 481 & 10.12 & 3.87 & 4.21 & 25.57 \\
+Sugar supply (kcal/cap/day) & 481 & 163.76 & 107.46 & 20.49 & 526.78 \\
+Vegetable oils (kcal/cap/day) & 481 & 233.26 & 107.85 & 16.27 & 564.16 \\
+GDP per capita (2015 USD) & 481 & 2,429 & 3,088 & 401 & 19,482 \\
+Urban population (\%) & 481 & 43.54 & 16.90 & 15.48 & 91.22 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For the global analysis of Section 5, we use the full NCD-RisC database covering 200 countries (2010--2021) without restricting to FAOSTAT availability.

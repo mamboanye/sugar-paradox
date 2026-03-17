@@ -1,0 +1,53 @@
+{
+  "one_way_fe": {
+    "beta": 0.0345,
+    "t_cl": 0.25,
+    "p": 0.7995,
+    "note": "Country FE only, no year FE"
+  },
+  "twfe_bivariate": {
+    "beta": -0.014,
+    "t_cl": -0.28,
+    "p": 0.7797
+  },
+  "twfe_with_oil": {
+    "beta": -0.0287,
+    "t_cl": -0.64,
+    "p": 0.5235
+  },
+  "detrended_bivariate": {
+    "beta": -0.0003,
+    "t_cl": -0.05,
+    "p": 0.9589
+  },
+  "detrended": {
+    "beta": -0.0008,
+    "t_cl": -0.13,
+    "p": 0.8963
+  },
+  "first_differences": {
+    "r": -0.026,
+    "p": 0.5858,
+    "n_obs": 444
+  },
+  "long_differences_2010_2020": {
+    "r": -0.194,
+    "p": 0.2505,
+    "n_countries": 37
+  },
+  "mundlak_cre": {
+    "within_beta": -0.0287,
+    "within_t_cl": -0.66,
+    "between_beta": 0.6586,
+    "between_t_cl": 3.46
+  },
+  "lin_2018_reconciliation": {
+    "sugar_only_nonclustered_fe_t": 0.66,
+    "sugar_only_nonclustered_fe_p": 0.5071,
+    "sugar_only_clustered_fe_t_cl": 0.21,
+    "sugar_only_clustered_fe_p": 0.8322,
+    "sugar_oil_clustered_fe_t_cl": 0.25,
+    "sugar_oil_clustered_twfe_t_cl": -0.64,
+    "interpretation": "Sugar is null under every specification in SSA data, including the most generous (non-clustered, one-way FE, no oil control). Lin 2018 likely found significance from a global sample where co-trending was stronger. The soybean oil case study (script 05) demonstrates the co-trending mechanism that can produce spurious significance under one-way FE."
+  }
+}
