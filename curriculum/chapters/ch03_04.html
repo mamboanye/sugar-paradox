@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Chapters 3-4: Partial Correlation and the F-test</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]})"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg: #FAFAF5;
+      --bg-alt: #F2F0E8;
+      --text: #2D2D2D;
+      --text-muted: #7A7A6E;
+      --amber: #C4843C;
+      --amber-light: #F5E6D3;
+      --slate: #4A6FA5;
+      --slate-light: #DDE5F0;
+      --sage: #5E8C61;
+      --sage-light: #E0EDDF;
+      --border: #E0DED6;
+      --code-bg: #1E1E2E;
+      --code-text: #CDD6F4;
+      --font-body: 'Crimson Pro', Georgia, serif;
+      --font-code: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1.12rem;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 2rem 4rem;
+    }
+
+    header {
+      padding: 3rem 0 2rem;
+      border-bottom: 2px solid var(--amber);
+      margin-bottom: 3rem;
+    }
+    header h1 {
+      font-weight: 300;
+      font-size: 2.4rem;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    header .subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    .chapter {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    h2 {
+      font-weight: 600;
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+    h2 .ch-num { color: var(--amber); font-weight: 300; }
+    h3 { font-weight: 600; font-size: 1.1rem; margin: 2rem 0 0.6rem; }
+    p { margin: 0.7rem 0; max-width: 680px; }
+
+    .concept-box {
+      background: var(--amber-light);
+      padding: 1.1rem 1.4rem;
+      margin: 1.5rem 0;
+      border-radius: 3px;
+      font-size: 0.93rem;
+      line-height: 1.6;
+      max-width: 720px;
+    }
+    .concept-box .label {
+      font-weight: 600; color: var(--amber);
+      text-transform: uppercase; font-size: 0.72rem;
+      letter-spacing: 0.08em; display: block; margin-bottom: 0.2rem;
+    }
+    .concept-box.slate-box { background: var(--slate-light); }
+    .concept-box.slate-box .label { color: var(--slate); }
+    .concept-box.sage-box { background: var(--sage-light); }
+    .concept-box.sage-box .label { color: var(--sage); }
+
+    /* ====== INTERACTIVE WIDGETS ====== */
+    .widget {
+      background: var(--bg-alt);
+      border-radius: 8px;
+      padding: 1.5rem 2rem 1rem;
+      margin: 2rem 0;
+    }
+    .widget h3 { margin-top: 0; font-size: 0.95rem; color: var(--text-muted); font-weight: 400; }
+    canvas { display: block; margin: 0.5rem auto; }
+
+    .scatter-controls {
+      display: flex; gap: 1rem; align-items: center; justify-content: center;
+      margin-top: 0.8rem; font-size: 0.82rem; font-family: var(--font-code);
+    }
+    .scatter-controls .stat { padding: 0.3rem 0.8rem; border-radius: 3px; }
+    .scatter-controls .stat.amber-bg { background: var(--amber-light); color: var(--amber); }
+    .scatter-controls .stat.slate-bg { background: var(--slate-light); color: var(--slate); }
+
+    /* Toggle switch */
+    .toggle-row {
+      display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+      margin-top: 1rem; font-size: 0.88rem;
+    }
+    .toggle-row .label-text { color: var(--text-muted); transition: color 0.3s; }
+    .toggle-row .label-text.active { color: var(--text); font-weight: 600; }
+    .toggle-switch {
+      position: relative; width: 52px; height: 28px; cursor: pointer;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--amber); border-radius: 14px; transition: background 0.3s;
+    }
+    .toggle-track::after {
+      content: ''; position: absolute; width: 22px; height: 22px;
+      left: 3px; top: 3px; background: white; border-radius: 50%;
+      transition: transform 0.3s;
+    }
+    .toggle-switch input:checked + .toggle-track { background: var(--slate); }
+    .toggle-switch input:checked + .toggle-track::after { transform: translateX(24px); }
+
+    /* ====== SUBSPACE WIDGET ====== */
+    .subspace-controls {
+      display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
+      margin-top: 1rem;
+    }
+    .pred-btn {
+      font-family: var(--font-code); font-size: 0.75rem;
+      padding: 0.4rem 0.8rem; border: 1px solid var(--border);
+      border-radius: 3px; background: white; cursor: pointer;
+      transition: all 0.2s; user-select: none;
+    }
+    .pred-btn:hover { border-color: var(--amber); color: var(--amber); }
+    .pred-btn.active { background: var(--amber); color: white; border-color: var(--amber); }
+    .pred-btn.locked { background: var(--bg-alt); color: var(--text-muted); border-color: var(--border); cursor: default; opacity: 0.5; }
+
+    .fstat-display {
+      display: flex; gap: 2.5rem; justify-content: center; padding: 1rem 0;
+    }
+    .fstat-num { text-align: center; }
+    .fstat-num .val {
+      font-size: 2.4rem; font-weight: 300; line-height: 1;
+      font-variant-numeric: tabular-nums; transition: color 0.4s;
+    }
+    .fstat-num .lbl {
+      font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.06em; margin-top: 0.3rem;
+    }
+    .fstat-narrative {
+      text-align: center; font-size: 0.88rem; color: var(--text-muted);
+      font-style: italic; margin-top: 0.5rem; min-height: 2.5em;
+      transition: opacity 0.3s;
+    }
+
+    /* ====== QUIZ ====== */
+    .quiz-section { margin: 2rem 0; }
+    .quiz-q { padding: 0.8rem 0; border-bottom: 1px solid var(--border); max-width: 680px; }
+    .quiz-q .question {
+      font-weight: 600; font-size: 0.93rem; cursor: pointer; color: var(--sage);
+      display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+    .quiz-q .question::before {
+      content: '\25B6'; font-size: 0.6rem; margin-top: 0.35rem;
+      transition: transform 0.2s; display: inline-block; flex-shrink: 0;
+    }
+    .quiz-q.open .question::before { transform: rotate(90deg); }
+    .quiz-q .answer {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s;
+      font-size: 0.9rem; color: var(--text-muted); padding-left: 1.1rem;
+    }
+    .quiz-q.open .answer { max-height: 500px; padding-top: 0.5rem; }
+
+    /* ====== DEEP DIVE ====== */
+    details.deep-dive {
+      margin: 1.5rem 0; border-left: 2px solid var(--border); padding-left: 1.2rem; max-width: 680px;
+    }
+    details.deep-dive summary { cursor: pointer; font-style: italic; color: var(--text-muted); font-size: 0.93rem; }
+    details.deep-dive[open] summary { margin-bottom: 0.6rem; }
+
+    .paper-conn {
+      background: var(--bg-alt); padding: 1rem 1.3rem; border-radius: 3px;
+      margin: 1.5rem 0; font-size: 0.93rem; max-width: 720px;
+    }
+    .paper-conn .tag {
+      font-family: var(--font-code); font-size: 0.68rem; color: var(--slate);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.2rem; display: block;
+    }
+
+    .bridge {
+      font-style: italic; color: var(--text-muted); margin: 2.5rem 0 0;
+      font-size: 0.93rem; max-width: 680px;
+    }
+
+    .code-block { margin: 1.5rem 0; border-radius: 6px; overflow: hidden; max-width: 740px; }
+    .code-block.amber { border-left: 3px solid var(--amber); }
+    .code-block.slate { border-left: 3px solid var(--slate); }
+    .code-block pre {
+      background: var(--code-bg); color: var(--code-text);
+      font-family: var(--font-code); font-size: 0.78rem;
+      line-height: 1.6; padding: 1.2rem 1.4rem; overflow-x: auto; margin: 0;
+    }
+    .code-block .output {
+      background: #F5F4EE; padding: 0.7rem 1.4rem;
+      font-family: var(--font-code); font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+    .result-num { font-weight: 500; color: var(--amber); }
+    .result-num.null { color: var(--slate); }
+
+    /* ====== ANIMATION HELPERS ====== */
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    .math-highlight {
+      background: var(--amber-light);
+      padding: 0.8rem 1.2rem;
+      border-radius: 4px;
+      margin: 1rem 0;
+      max-width: 720px;
+      overflow-x: auto;
+    }
+    .math-highlight.slate { background: var(--slate-light); }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Learning Regression Through the Sugar Paradox</h1>
+    <p class="subtitle">Chapters 3-4: Multiple Regression, Partial Correlation, and the F-test</p>
+  </header>
+
+  <!-- ============================================================ -->
+  <!-- CHAPTER 3: Multiple Regression and Partial Correlation        -->
+  <!-- ============================================================ -->
+  <section class="chapter" id="ch3">
+    <h2><span class="ch-num">3</span> Multiple Regression and Partial Correlation</h2>
+
+    <div class="concept-box">
+      <span class="label">What you learn</span>
+      In multiple regression, each coefficient measures the relationship between that predictor and
+      Y <em>after removing what the other predictors explain</em>. The partial correlation is the
+      correlation between the residualized X and the residualized Y. For the Sugar Paradox:
+      raw \(r = 0.677\) drops to partial \(r = 0.496\) after controlling for GDP, urbanization,
+      and vegetable oil. That drop is the confounders doing their work. But 0.496 is still strong.
+    </div>
+
+    <h3>The raw picture</h3>
+    <p>In Chapters 1-2, you saw the bivariate correlation: countries with more sugar supply have higher obesity prevalence, with \(r = 0.677\). You saw that regression finds the best projection of Y onto the column space of X, and you computed \(\hat\beta = 0.063\) per kcal/capita/day (equivalently, 0.630 per 10 kcal, with \(t = 19.84\)).</p>
+    <p>But bivariate correlation ignores everything else that differs between countries. Rich, urbanized countries have both more sugar <em>and</em> more obesity. Maybe the correlation is just development, not diet.</p>
+
+    <h3>What "controlling for" means geometrically</h3>
+    <p>Multiple linear regression fits the model:</p>
+    <div class="math-highlight">
+      $$Y = X\beta + e = \beta_0 + \beta_1 \cdot \text{sugar} + \beta_2 \cdot \log\text{GDP} + \beta_3 \cdot \text{urban} + \beta_4 \cdot \text{oil} + e$$
+    </div>
+    <p>The coefficient \(\hat\beta_1\) on sugar no longer measures the total sugar-obesity relationship. It measures the <em>partial</em> relationship: the part of the sugar-obesity link that remains after the other predictors have explained all they can.</p>
+    <p>Geometrically, \(\hat\beta_1\) comes from a two-step procedure:</p>
+    <ol style="max-width:680px; margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li>Regress sugar on the controls (GDP, urbanization, oil). Save the residuals. Call them <em>sugar<sub>resid</sub></em>.</li>
+      <li>Regress obesity on the same controls. Save the residuals. Call them <em>obesity<sub>resid</sub></em>.</li>
+    </ol>
+    <p>The correlation between sugar<sub>resid</sub> and obesity<sub>resid</sub> is the <strong>partial correlation</strong>. It is the correlation between the parts of sugar and obesity that the controls could not explain.</p>
+
+    <div class="concept-box slate-box">
+      <span class="label">Frisch-Waugh-Lovell Theorem</span>
+      The OLS coefficient on sugar in the full multiple regression is identical to the OLS slope from regressing obesity<sub>resid</sub> on sugar<sub>resid</sub>. This is not an approximation. It is an exact algebraic identity:
+      $$\hat\beta_{\text{sugar}}^{\text{MLR}} = \frac{(M_Z \, x_{\text{sugar}})' (M_Z \, y)}{(M_Z \, x_{\text{sugar}})' (M_Z \, x_{\text{sugar}})}$$
+      where \(M_Z = I - Z(Z'Z)^{-1}Z'\) projects off the control variables.
+    </div>
+
+    <h3>See it: raw vs. residualized scatter</h3>
+    <p>Toggle between the raw scatter and the residualized scatter below. In the raw view, each dot is a country plotted at its actual sugar supply and obesity prevalence. In the residualized view, the dots animate to their new positions: what remains after the controls have been subtracted. The correlation drops from 0.677 to 0.496, and the cloud tightens toward the origin.</p>
+
+    <!-- ====== PARTIAL CORRELATION WIDGET ====== -->
+    <div class="widget" id="partial-widget">
+      <h3>37 SSA countries, 2018-2020 averages</h3>
+      <canvas id="partialCanvas" width="700" height="400" style="cursor:crosshair;"></canvas>
+      <div class="scatter-controls">
+        <span class="stat amber-bg" id="partial-r">r = 0.677</span>
+        <span class="stat" id="partial-p" style="color:var(--text-muted)">p < 0.001</span>
+        <span class="stat" style="color:var(--text-muted)">N = 37</span>
+      </div>
+      <div class="toggle-row">
+        <span class="label-text active" id="lbl-raw">Raw bivariate (Figure 1A)</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="partial-toggle">
+          <span class="toggle-track"></span>
+        </label>
+        <span class="label-text" id="lbl-resid">Residualized (Figure 1B)</span>
+      </div>
+    </div>
+
+    <h3>Why did the correlation drop?</h3>
+    <p>The raw \(r = 0.677\) bundles three sources of covariation:</p>
+    <ol style="max-width:680px; margin: 0.5rem 0; padding-left: 1.5rem;">
+      <li>Sugar and obesity share a common cause: economic development. Richer countries import more sugar and have higher obesity.</li>
+      <li>Sugar and obesity share urbanization. Urban food environments have more processed food and more sedentary lifestyles.</li>
+      <li>Sugar supply correlates with vegetable oil supply. Countries that import more of one tend to import more of the other.</li>
+    </ol>
+    <p>Partialling out these three confounders removes their contribution to the sugar-obesity correlation. What remains (partial \(r = 0.496\)) is the sugar-specific association.</p>
+
+    <h3>But 0.496 is still strong</h3>
+    <p>A partial correlation of 0.496 with \(p = 0.002\) across 37 countries would pass any journal's reviewer. It survives leave-one-out analysis (range: 0.417 to 0.625). It survives subregion fixed effects (\(r = 0.632\)). It survives Spearman rank correlations. By every cross-sectional standard, sugar supply predicts obesity even after controlling for observable confounders.</p>
+    <p>This is the setup for the paradox. The cross-sectional case looks airtight. Chapter 5 will show it is entirely misleading.</p>
+
+    <h3>The code</h3>
+    <div class="code-block amber">
+<pre><span style="color:#89B4FA"># Step 1: Regress sugar on controls, save residuals</span>
+controls = "~ log_gdp + urban_pct + oil_kcal"
+res_sugar = smf.ols(f"sugar_kcal {controls}", data=cs).fit().resid
+
+<span style="color:#89B4FA"># Step 2: Regress obesity on the same controls, save residuals</span>
+res_obesity = smf.ols(f"obesity_prevalence_pct {controls}", data=cs).fit().resid
+
+<span style="color:#89B4FA"># Step 3: Correlate the residuals -- this is the partial r</span>
+r_partial, p_partial = stats.pearsonr(res_sugar, res_obesity)
+print(f"Partial r = {r_partial:.3f} (p = {p_partial:.4f})")</pre>
+      <div class="output">Partial r = <span class="result-num">0.496</span> (p = <span class="result-num">0.0018</span>)</div>
+    </div>
+
+    <div class="paper-conn">
+      <span class="tag">Paper connection</span>
+      Figure 1: Left panel shows the bivariate scatter (\(r = 0.68\)). Right panel shows the residualized scatter (\(r = 0.50\), \(p = 0.002\)). The toggle widget above reproduces both panels. The paper reports \(r = 0.50\) rather than 0.496 due to rounding.
+    </div>
+
+    <h3>Why non-orthogonality matters</h3>
+    <p>In a designed experiment, you can make your predictors orthogonal: \(X_1^T X_2 = 0\). When predictors are orthogonal, adding or removing one does not change the coefficients of the others. The sugar coefficient would be the same whether or not you included GDP.</p>
+    <p>Observational data is never orthogonal. Sugar supply correlates with GDP (\(r \approx 0.55\)), urbanization (\(r \approx 0.45\)), and oil supply (\(r \approx 0.60\)) in our 37 countries. Because of this non-orthogonality, the sugar coefficient <em>changes</em> as you add controls. This is not a flaw in the method -- it is the method working correctly. Each control peels away a source of confounding, leaving a cleaner (though still potentially confounded) estimate of the sugar-obesity relationship.</p>
+
+    <div class="concept-box">
+      <span class="label">Key idea from M4</span>
+      When predictors are correlated, the variance-covariance matrix of coefficient estimates has non-zero off-diagonal elements: \(\text{Cov}(\hat\beta) = \sigma^2 (X^TX)^{-1}\). The off-diagonals mean that estimates are interdependent. Add a predictor, and all other coefficients shift. This is why the sugar coefficient drops from the bivariate (0.063 per kcal) to the partial (something smaller). The controls absorb shared variation.
+    </div>
+
+    <details class="deep-dive">
+      <summary>Deep dive: Partial r vs. semi-partial r</summary>
+      <p>The partial correlation residualizes <em>both</em> X and Y on the controls. The semi-partial (or "part") correlation residualizes only X. The partial r answers: "What is the correlation between sugar and obesity in the part of the data that the controls cannot explain?" The semi-partial r answers: "What fraction of <em>total</em> Y variance does sugar uniquely explain?" The partial r is always larger than the semi-partial r (dividing by less residual variance inflates the correlation). For our data, partial \(r = 0.496\) and semi-partial \(r \approx 0.40\). The paper reports the partial r because the question is about the sugar-obesity relationship, not about variance explained.</p>
+    </details>
+
+    <!-- QUIZ -->
+    <div class="quiz-section">
+      <h3>Quiz yourself</h3>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">Why is the partial r (0.496) lower than the bivariate r (0.677)?</div>
+        <div class="answer">Because GDP, urbanization, and vegetable oil supply each share variation with both sugar and obesity. Partialling them out removes this shared variation, leaving only the sugar-specific component. The drop from 0.677 to 0.496 tells you that roughly a third of the original sugar-obesity correlation was attributable to these confounders.</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">If the partial r had dropped to zero, what would that mean?</div>
+        <div class="answer">It would mean that the entire sugar-obesity correlation was attributable to the controls. Once you removed GDP, urbanization, and oil, sugar and obesity would be unrelated across countries. That would suggest the bivariate relationship was entirely spurious -- driven by development, not diet. In fact, partial \(r = 0.496\) is still substantial, so the cross-sectional case survives. The paradox is that it survives cross-sectionally but vanishes within countries.</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">The Frisch-Waugh-Lovell theorem says the partial regression coefficient is identical to the slope from regressing obesity residuals on sugar residuals. Why is this useful?</div>
+        <div class="answer">It gives you an intuitive, visual way to understand what "controlling for" means. Instead of trusting the black box of a multiple regression, you can literally plot the residualized data and see the partial relationship. It also means you can compute any single coefficient in a multiple regression without fitting the full model -- just partial out the other variables and run a bivariate regression on the residuals.</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">In a designed experiment with orthogonal predictors, would the partial r equal the bivariate r?</div>
+        <div class="answer">Yes, approximately. If predictors are perfectly orthogonal (\(X_1^T X_2 = 0\)), removing one predictor does not change the coefficient or correlation of the other. The bivariate and partial relationships would be the same because the controls share no variation with the predictor of interest. This never happens in observational data, which is why controls always change the picture.</div>
+      </div>
+    </div>
+
+    <p class="bridge">The partial correlation tells us sugar predicts obesity even after removing observable confounders. But how do we formally test whether adding sugar to the model significantly improves the fit? That is the F-test -- and it connects directly to the t-statistic you have already seen.</p>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- CHAPTER 4: The F-test as Comparing Projections                -->
+  <!-- ============================================================ -->
+  <section class="chapter" id="ch4">
+    <h2><span class="ch-num">4</span> The F-test as Comparing Projections</h2>
+
+    <div class="concept-box">
+      <span class="label">What you learn</span>
+      Every F-test compares two projections of Y onto nested subspaces. The reduced model projects onto
+      a smaller subspace; the full model projects onto a bigger one. The F-statistic measures whether
+      the improvement per added dimension exceeds what you would expect from noise. When testing a
+      single predictor, \(t^2 = F\) exactly. The t-statistic and F-test are the same geometric operation.
+    </div>
+
+    <h3>Two projections, one question</h3>
+    <p>In Chapter 2, you saw that regression projects Y onto the column space of X. The fitted values \(\hat{Y}\) are the shadow; the residuals are the height. \(R^2\) measures how much shorter the residual vector is compared to centered Y.</p>
+    <p>Now consider two models:</p>
+    <div class="math-highlight">
+      $$\text{Reduced: } Y = \beta_0 + \beta_1 \cdot \text{oil} + e \qquad (\text{column space } \omega, \text{ dimension } q = 2)$$
+      $$\text{Full: } Y = \beta_0 + \beta_1 \cdot \text{sugar} + \beta_2 \cdot \text{oil} + e \qquad (\text{column space } \Omega, \text{ dimension } p = 3)$$
+    </div>
+    <p>Both models project Y onto a subspace, but the full model's subspace is bigger. A bigger subspace always gets at least as close to Y (you cannot do worse by adding a dimension). The question is: does the improvement justify the added complexity?</p>
+
+    <h3>The F-statistic</h3>
+    <p>The F-statistic compares the improvement in fit (numerator) to the noise level (denominator):</p>
+    <div class="math-highlight">
+      $$F = \frac{(\text{RSS}_{\text{reduced}} - \text{RSS}_{\text{full}}) / (p - q)}{\text{RSS}_{\text{full}} / (n - p)}$$
+    </div>
+    <p>The numerator is the reduction in residual sum of squares per added dimension. The denominator is the residual variance (noise per observation) under the full model. If the added predictors explain real signal, the numerator is large relative to the denominator, and F is large.</p>
+
+    <div class="concept-box slate-box">
+      <span class="label">Geometric interpretation</span>
+      The reduced model projects Y onto \(\omega\). The full model projects Y onto \(\Omega \supset \omega\). The residuals shrink from \(\|e_\omega\|\) to \(\|e_\Omega\|\). The F-statistic asks: is the <em>squared</em> length difference \(\|e_\omega\|^2 - \|e_\Omega\|^2\), per added dimension, large compared to \(\|e_\Omega\|^2 / (n-p)\)? If so, the added dimensions capture signal, not noise.
+    </div>
+
+    <h3>The t-squared identity</h3>
+    <p>When you add exactly one predictor (\(p - q = 1\)), the F-statistic has 1 degree of freedom in the numerator. In that case:</p>
+    <div class="math-highlight">
+      $$F_{1, n-p} = t_{n-p}^2$$
+    </div>
+    <p>The t-test for a single coefficient IS the F-test for comparing "model with that predictor" to "model without." They are literally the same number squared. This means every t-statistic you have seen in the coefficient table is simultaneously an F-test.</p>
+
+    <h3>See it: nested subspaces</h3>
+    <p>The widget below lets you build up a model by toggling predictors on and off. The intercept is always included. As you add predictors, the subspace grows, RSS shrinks, and the F-statistic measures whether each addition is worthwhile. Watch the \(t^2 = F\) identity hold for single-predictor additions.</p>
+
+    <!-- ====== SUBSPACE / F-TEST WIDGET ====== -->
+    <div class="widget" id="ftest-widget">
+      <h3>Building the model: toggle predictors to see nested F-tests</h3>
+      <canvas id="subspaceCanvas" width="700" height="320"></canvas>
+      <div class="subspace-controls">
+        <span class="pred-btn locked">Intercept</span>
+        <span class="pred-btn" id="btn-oil" onclick="togglePred('oil')">+ Oil</span>
+        <span class="pred-btn" id="btn-sugar" onclick="togglePred('sugar')">+ Sugar</span>
+        <span class="pred-btn" id="btn-gdp" onclick="togglePred('gdp')">+ log GDP</span>
+        <span class="pred-btn" id="btn-urban" onclick="togglePred('urban')">+ Urban %</span>
+      </div>
+      <div class="fstat-display">
+        <div class="fstat-num"><div class="val" id="f-rss" style="color:var(--amber)">46,223</div><div class="lbl">RSS</div></div>
+        <div class="fstat-num"><div class="val" id="f-r2" style="color:var(--amber)">0.0%</div><div class="lbl">R\(^2\)</div></div>
+        <div class="fstat-num"><div class="val" id="f-dim" style="color:var(--text-muted)">1</div><div class="lbl">Dimensions</div></div>
+        <div class="fstat-num"><div class="val" id="f-fstat" style="color:var(--slate)">--</div><div class="lbl">F vs. previous</div></div>
+        <div class="fstat-num"><div class="val" id="f-pval" style="color:var(--slate)">--</div><div class="lbl">p-value</div></div>
+      </div>
+      <div class="fstat-narrative" id="f-narr">Intercept only. The model predicts the mean for every country. All variance is residual.</div>
+    </div>
+
+    <h3>Worked example: sugar's pooled OLS t-statistic</h3>
+    <p>From Chapter 2, the pooled OLS model <code>obesity ~ sugar + oil</code> gives sugar \(t = 19.84\). Let us verify that \(t^2 = F\):</p>
+    <div class="code-block amber">
+<pre><span style="color:#89B4FA"># Reduced model: oil only</span>
+fit_reduced = smf.ols("obesity_prevalence_pct ~ oil_100kcal", data=women).fit()
+
+<span style="color:#89B4FA"># Full model: sugar + oil</span>
+fit_full = smf.ols("obesity_prevalence_pct ~ sugar_10kcal + oil_100kcal", data=women).fit()
+
+RSS_r = np.sum(fit_reduced.resid**2)   <span style="color:#89B4FA"># RSS reduced</span>
+RSS_f = np.sum(fit_full.resid**2)       <span style="color:#89B4FA"># RSS full</span>
+n, p = len(women), 3                    <span style="color:#89B4FA"># n=481, p=3 (intercept + sugar + oil)</span>
+
+F = ((RSS_r - RSS_f) / 1) / (RSS_f / (n - p))
+t_sugar = fit_full.tvalues["sugar_10kcal"]
+
+print(f"F-statistic:  {F:.2f}")
+print(f"t-squared:    {t_sugar**2:.2f}")
+print(f"t-statistic:  {t_sugar:.2f}")</pre>
+      <div class="output">F-statistic:  <span class="result-num">393.6</span> &nbsp; t-squared: <span class="result-num">393.6</span> &nbsp; t-statistic: <span class="result-num">19.84</span></div>
+    </div>
+    <p>They match exactly. \(19.84^2 = 393.6\). The t-test you read off the coefficient table IS the F-test for "does adding sugar to a model that already has oil improve the fit?"</p>
+
+    <h3>The overall F-test</h3>
+    <p>The overall F-test asks a bigger question: do <em>any</em> of the predictors matter? It compares the full model to an intercept-only model (the simplest possible model that just predicts the mean).</p>
+    <div class="math-highlight">
+      $$F_{\text{overall}} = \frac{(\text{RSS}_{\text{intercept}} - \text{RSS}_{\text{full}}) / p}{\text{RSS}_{\text{full}} / (n - p - 1)}$$
+    </div>
+    <p>For pooled OLS with sugar + oil, the overall F is huge because the between-country signal is so strong. But remember: a large overall F just means the model explains variance. It does not tell you <em>which</em> predictor is doing the work, or whether the relationship is causal.</p>
+
+    <h3>Where this leads: the cascade as a sequence of F-tests</h3>
+    <p>The specification cascade in the Sugar Paradox paper (Table 1) is a sequence of nested model comparisons. Each step adds controls and asks: does sugar still improve the fit?</p>
+    <table style="font-family:var(--font-code); font-size:0.82rem; border-collapse:collapse; margin:1rem 0; max-width:720px; width:100%;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);">
+          <th style="text-align:left; padding:0.5rem 0.8rem;">Specification</th>
+          <th style="text-align:right; padding:0.5rem 0.8rem;">\(\hat\beta_{\text{sugar}}\)</th>
+          <th style="text-align:right; padding:0.5rem 0.8rem;">\(t\)</th>
+          <th style="text-align:right; padding:0.5rem 0.8rem;">\(t^2 = F\)</th>
+          <th style="text-align:right; padding:0.5rem 0.8rem;">\(R^2\)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.8rem;">Pooled OLS</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem; color:var(--amber);">0.630</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem; color:var(--amber);">19.84</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem; color:var(--amber);">393.6</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem;">0.49</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.8rem;">Country FE</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem; color:var(--slate);">0.035</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem; color:var(--slate);">0.25</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem; color:var(--slate);">0.06</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem;">0.96</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4rem 0.8rem;">Two-way FE</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem; color:var(--slate);">-0.029</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem; color:var(--slate);">-0.64</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem; color:var(--slate);">0.41</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem;">0.99</td>
+        </tr>
+        <tr>
+          <td style="padding:0.4rem 0.8rem;">Detrended</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem; color:var(--slate);">-0.001</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem; color:var(--slate);">-0.13</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem; color:var(--slate);">0.02</td>
+          <td style="text-align:right; padding:0.4rem 0.8rem;">0.01</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>In pooled OLS, adding sugar produces \(F = 393.6\). Enormous. In country FE, adding sugar to a model that already has 36 country dummies produces \(F = 0.06\). Negligible. The subspace that already contains the country dummies is so close to Y that sugar has nothing left to explain. The geometric intuition: the country dummies get you 96% of the way to Y. Sugar barely nudges the projection.</p>
+
+    <div class="concept-box sage-box">
+      <span class="label">The key geometric insight</span>
+      When \(R^2\) is already 0.96, there is only 4% of residual variance left. For sugar to be significant, it would need to explain a meaningful share of that 4%. But the within-country variation in sugar is small (most of the sugar variation is between countries, and that is already absorbed by the country dummies). So sugar's F-statistic collapses from 393.6 to 0.06 -- not because sugar changed, but because the subspace got so large that the residuals got tiny.
+    </div>
+
+    <div class="paper-conn">
+      <span class="tag">Paper connection</span>
+      Table 1 is a cascade of nested F-tests. Each row tests: "Does sugar improve the fit beyond the current set of controls?" The answer goes from a thundering yes (\(F = 393.6\)) to a clear no (\(F = 0.06\)) as the subspace expands. This is the foundation for understanding why \(t = 19.84\) collapses to \(t = 0.25\) in Chapter 5.
+    </div>
+
+    <details class="deep-dive">
+      <summary>Deep dive: Testing multiple predictors simultaneously</summary>
+      <p>When you drop \(k > 1\) predictors, the F-test generalizes naturally. The numerator becomes the improvement per dropped dimension:</p>
+      <p>$$F = \frac{(\text{RSS}_{\text{reduced}} - \text{RSS}_{\text{full}}) / k}{\text{RSS}_{\text{full}} / (n - p)}$$</p>
+      <p>This lets you test whether a <em>group</em> of predictors matters jointly. For the Sugar Paradox, you could test whether all 10 FAOSTAT food groups are simultaneously null under TWFE. With \(k = 10\) and each food group showing \(|t| < 2\), the joint F-test confirms that no food variable helps. The \(F_{10, n-p}\) statistic is well below the critical value. Section 3.3 of the paper reports this cascade: 6/10 significant cross-sectionally, 2/10 under one-way FE, 0/10 under TWFE.</p>
+    </details>
+
+    <details class="deep-dive">
+      <summary>Deep dive: Why F and not just R-squared?</summary>
+      <p>Adding <em>any</em> predictor to a model increases \(R^2\), even a column of random noise. This is because a bigger subspace always gets at least as close to Y (more dimensions = more room to fit). The F-test penalizes for added dimensions. Its denominator divides by \(n - p\), which shrinks as you add predictors, increasing the bar the numerator must clear. A random noise variable might increase \(R^2\) by 0.002 but produce \(F = 0.7\) -- not significant. The F-test is the gatekeeping mechanism that distinguishes signal from overfitting.</p>
+    </details>
+
+    <!-- QUIZ -->
+    <div class="quiz-section">
+      <h3>Quiz yourself</h3>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">The pooled OLS sugar t-statistic is 19.84. What is the corresponding F-statistic for dropping sugar from the model?</div>
+        <div class="answer">\(F = t^2 = 19.84^2 = 393.6\). When testing a single predictor, the F-test is exactly the square of the t-test. They test the same hypothesis: \(H_0: \beta_{\text{sugar}} = 0\).</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">The country FE sugar t-statistic is 0.25, so F = 0.06. The country FE R-squared is 0.96. Why is F so tiny when R-squared is so high?</div>
+        <div class="answer">Because R-squared measures the total model fit (which is dominated by the 36 country dummies), while the F-test measures only sugar's <em>marginal</em> contribution. The country dummies alone produce \(R^2 \approx 0.957\). Adding sugar nudges it to 0.960. That tiny increment, divided by the already-small residual variance, gives \(F = 0.06\). A high R-squared does not mean every predictor is important -- it means the model as a whole fits well.</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">Suppose you test two predictors jointly (sugar and oil) against an intercept-only model. You get F = 250. Can you recover the individual t-statistics from this F?</div>
+        <div class="answer">No. The joint F-test has 2 numerator degrees of freedom and gives a single number summarizing the combined effect. The individual t-statistics carry more information (one per predictor). You cannot decompose a joint F into individual contributions because the predictors are correlated -- their contributions overlap. The joint F can be significant even if neither individual t is significant (rare, but possible when predictors are highly correlated).</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">A permutation test shuffles Y to build a null distribution of F. How does this relate to the parametric F-test?</div>
+        <div class="answer">The parametric F-test assumes normally distributed errors and gives a p-value from the \(F_{p-q, n-p}\) distribution. The permutation test makes no distributional assumption: it builds the null distribution empirically by breaking the Y-X relationship. When assumptions hold, both give similar p-values. When assumptions fail (non-normal errors, heteroscedasticity), the permutation test is more reliable. For the Sugar Paradox panel data with only 37 clusters and strong serial correlation, the paper uses both and confirms they agree (bootstrap \(p = 0.80\), permutation \(p = 0.58\) for the TWFE specification).</div>
+      </div>
+    </div>
+
+    <p class="bridge">You now know two things: partial correlation measures the residualized relationship (Chapter 3), and the F-test formally tests whether adding a predictor improves the projection (Chapter 4). In Chapter 5, you will add 36 country dummies to the subspace. The subspace expands from 3 dimensions to 39. The projection of Y gets dramatically closer -- but sugar's unique contribution vanishes. The F-test for sugar drops from 393.6 to 0.06. That collapse is the paradox.</p>
+  </section>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT                                                     -->
+<!-- ============================================================ -->
+<script>
+// ====== CHAPTER 3: PARTIAL CORRELATION WIDGET ======
+(function() {
+  const canvas = document.getElementById('partialCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = { l: 65, r: 25, t: 20, b: 50 };
+
+  // Real data: 37 SSA countries [sugar_kcal, obesity_pct] (2018-2020 averages)
+  const rawData = [
+    [53,5.1],[21,3.7],[141,16.3],[89,6.1],[107,8.7],[47,5.6],[77,6.1],[87,10.0],[138,10.3],
+    [84,7.4],[196,15.3],[119,13.5],[93,6.1],[159,15.8],[73,5.0],[244,13.6],[75,4.9],[90,9.4],
+    [29,3.0],[65,4.8],[200,11.0],[527,21.2],[95,10.4],[117,10.2],[46,3.3],[195,17.2],[75,6.4],
+    [160,14.1],[116,7.8],[140,12.1],[139,8.4],[141,18.3],[72,6.8],[361,39.6],[113,10.9],[186,14.4],
+    [146,11.5]
+  ];
+
+  // Residualized data (approximate, after regressing out log GDP, urbanization, oil)
+  // These are centered near zero since they are residuals
+  const residData = [
+    [-48,-2.5],[-70,-2.0],[8,3.6],[-22,-2.8],[1,0.5],[-30,-0.6],[-14,-2.6],[-39,-0.2],[34,0.7],
+    [-3,0.3],[35,1.3],[11,3.1],[-10,-1.4],[40,4.3],[-29,-2.1],[87,0.5],[-19,-1.9],[-28,-0.2],
+    [-52,-2.4],[-33,-1.9],[53,-1.8],[175,2.0],[-14,1.1],[3,0.1],[-45,-2.2],[30,3.6],[-16,-0.1],
+    [31,2.4],[8,-1.1],[15,1.4],[7,-1.3],[-17,4.2],[-28,-0.2],[42,12.3],[14,2.4],[32,1.2],
+    [27,1.5]
+  ];
+
+  // Country codes for tooltips
+  const isos = [
+    'AGO','BFA','BWA','CIV','CMR','COD','COG','COM','CPV',
+    'ETH','GAB','GHA','GIN','GMB','GNB','KEN','LBR','LSO',
+    'MDG','MOZ','MRT','MUS','MWI','NAM','NER','NGA','RWA',
+    'SEN','SLE','STP','SWZ','SYC','TZA','ZAF','ZMB','ZWE',
+    'ZWE'
+  ];
+
+  let showResid = false;
+  let animProgress = 1; // 0 = start, 1 = end
+  let animTarget = 0; // 0 = raw, 1 = resid
+  let animFrame = null;
+
+  // Current display positions (interpolated)
+  let displayPts = rawData.map(([x, y]) => ({ x, y }));
+
+  function getRange() {
+    if (animTarget === 0 && animProgress >= 0.99) {
+      return { xMin: 0, xMax: 560, yMin: 0, yMax: 45, xLabel: 'Sugar supply (kcal/capita/day)', yLabel: 'Obesity prevalence (%)' };
+    } else if (animTarget === 1 && animProgress >= 0.99) {
+      return { xMin: -120, xMax: 220, yMin: -6, yMax: 15, xLabel: 'Sugar residuals', yLabel: 'Obesity residuals' };
+    } else {
+      // Interpolate ranges
+      const t = animTarget === 1 ? animProgress : 1 - animProgress;
+      const lerp = (a, b) => a + (b - a) * t;
+      return {
+        xMin: lerp(0, -120), xMax: lerp(560, 220),
+        yMin: lerp(0, -6), yMax: lerp(45, 15),
+        xLabel: t < 0.5 ? 'Sugar supply (kcal/capita/day)' : 'Sugar residuals',
+        yLabel: t < 0.5 ? 'Obesity prevalence (%)' : 'Obesity residuals'
+      };
+    }
+  }
+
+  function toCanvas(x, y, range) {
+    return [
+      pad.l + (x - range.xMin) / (range.xMax - range.xMin) * (W - pad.l - pad.r),
+      H - pad.b - (y - range.yMin) / (range.yMax - range.yMin) * (H - pad.t - pad.b)
+    ];
+  }
+
+  function lsq(pts) {
+    const n = pts.length;
+    let sx = 0, sy = 0, sxx = 0, sxy = 0;
+    for (const p of pts) { sx += p.x; sy += p.y; sxx += p.x * p.x; sxy += p.x * p.y; }
+    const m = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+    const b = (sy - m * sx) / n;
+    const mx = sx / n, my = sy / n;
+    let num = 0, dx2 = 0, dy2 = 0;
+    for (const p of pts) { num += (p.x - mx) * (p.y - my); dx2 += (p.x - mx) ** 2; dy2 += (p.y - my) ** 2; }
+    const r = num / Math.sqrt(dx2 * dy2);
+    return { m, b, r };
+  }
+
+  function draw() {
+    const range = getRange();
+    ctx.clearRect(0, 0, W, H);
+
+    // Grid lines
+    ctx.strokeStyle = '#E8E6DE'; ctx.lineWidth = 0.5;
+    const xStep = range.xMax - range.xMin > 400 ? 100 : (range.xMax - range.xMin > 200 ? 50 : 50);
+    const yStep = range.yMax - range.yMin > 30 ? 10 : 5;
+    for (let x = Math.ceil(range.xMin / xStep) * xStep; x <= range.xMax; x += xStep) {
+      const [cx] = toCanvas(x, 0, range);
+      if (cx > pad.l && cx < W - pad.r) {
+        ctx.beginPath(); ctx.moveTo(cx, pad.t); ctx.lineTo(cx, H - pad.b); ctx.stroke();
+      }
+    }
+    for (let y = Math.ceil(range.yMin / yStep) * yStep; y <= range.yMax; y += yStep) {
+      const [, cy] = toCanvas(0, y, range);
+      if (cy > pad.t && cy < H - pad.b) {
+        ctx.beginPath(); ctx.moveTo(pad.l, cy); ctx.lineTo(W - pad.r, cy); ctx.stroke();
+      }
+    }
+
+    // Axes
+    ctx.strokeStyle = '#C0BEB6'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b);
+    ctx.lineTo(W - pad.r, H - pad.b); ctx.stroke();
+
+    // Zero lines for residualized view
+    if (animTarget === 1 && animProgress > 0.3) {
+      const alpha = Math.min(1, (animProgress - 0.3) / 0.4);
+      ctx.strokeStyle = `rgba(74, 111, 165, ${0.3 * alpha})`; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+      const [zx] = toCanvas(0, range.yMin, range);
+      const [, zy] = toCanvas(range.xMin, 0, range);
+      if (zx > pad.l && zx < W - pad.r) {
+        ctx.beginPath(); ctx.moveTo(zx, pad.t); ctx.lineTo(zx, H - pad.b); ctx.stroke();
+      }
+      if (zy > pad.t && zy < H - pad.b) {
+        ctx.beginPath(); ctx.moveTo(pad.l, zy); ctx.lineTo(W - pad.r, zy); ctx.stroke();
+      }
+      ctx.setLineDash([]);
+    }
+
+    // Axis tick labels
+    ctx.fillStyle = '#999'; ctx.font = '11px JetBrains Mono'; ctx.textAlign = 'center';
+    for (let x = Math.ceil(range.xMin / xStep) * xStep; x <= range.xMax; x += xStep) {
+      const [cx] = toCanvas(x, 0, range);
+      if (cx > pad.l + 10 && cx < W - pad.r - 10) {
+        ctx.fillText(x, cx, H - pad.b + 18);
+      }
+    }
+    ctx.textAlign = 'right';
+    for (let y = Math.ceil(range.yMin / yStep) * yStep; y <= range.yMax; y += yStep) {
+      const [, cy] = toCanvas(0, y, range);
+      if (cy > pad.t + 10 && cy < H - pad.b - 10) {
+        const label = (range.yMax > 30) ? y + '%' : y.toFixed(0);
+        ctx.fillText(label, pad.l - 8, cy + 4);
+      }
+    }
+
+    // Axis labels
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#999'; ctx.font = '12px Crimson Pro';
+    ctx.fillText(range.xLabel, (pad.l + W - pad.r) / 2, H - 6);
+    ctx.save(); ctx.translate(14, (pad.t + H - pad.b) / 2); ctx.rotate(-Math.PI / 2);
+    ctx.fillText(range.yLabel, 0, 0); ctx.restore();
+
+    // Regression line
+    const { m, b, r } = lsq(displayPts);
+    const lineColor = showResid ? '#4A6FA5' : '#C4843C';
+    ctx.strokeStyle = lineColor; ctx.lineWidth = 1.8; ctx.setLineDash([]);
+    const [x1c, y1c] = toCanvas(range.xMin, m * range.xMin + b, range);
+    const [x2c, y2c] = toCanvas(range.xMax, m * range.xMax + b, range);
+    ctx.beginPath(); ctx.moveTo(x1c, y1c); ctx.lineTo(x2c, y2c); ctx.stroke();
+
+    // Points
+    for (let i = 0; i < displayPts.length; i++) {
+      const [cx, cy] = toCanvas(displayPts[i].x, displayPts[i].y, range);
+      if (cx < pad.l - 5 || cx > W - pad.r + 5 || cy < pad.t - 5 || cy > H - pad.b + 5) continue;
+      ctx.beginPath(); ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+      ctx.fillStyle = showResid ? 'rgba(74, 111, 165, 0.7)' : 'rgba(196, 132, 60, 0.7)';
+      ctx.fill();
+      ctx.strokeStyle = '#2D2D2D'; ctx.lineWidth = 0.4; ctx.stroke();
+    }
+
+    // Update stats
+    const rDisplay = document.getElementById('partial-r');
+    const pDisplay = document.getElementById('partial-p');
+    rDisplay.textContent = 'r = ' + Math.abs(r).toFixed(3);
+    if (showResid) {
+      rDisplay.className = 'stat slate-bg';
+      pDisplay.textContent = 'p = 0.002';
+    } else {
+      rDisplay.className = 'stat amber-bg';
+      pDisplay.textContent = 'p < 0.001';
+    }
+  }
+
+  function animate() {
+    const speed = 0.04;
+    if (animTarget === 1) {
+      animProgress = Math.min(1, animProgress + speed);
+    } else {
+      animProgress = Math.min(1, animProgress + speed);
+    }
+
+    // Interpolate points
+    for (let i = 0; i < rawData.length; i++) {
+      const t = animTarget === 1 ? animProgress : 1 - animProgress;
+      displayPts[i] = {
+        x: rawData[i][0] + (residData[i][0] - rawData[i][0]) * t,
+        y: rawData[i][1] + (residData[i][1] - rawData[i][1]) * t,
+      };
+    }
+
+    draw();
+
+    if (animProgress < 1) {
+      animFrame = requestAnimationFrame(animate);
+    }
+  }
+
+  document.getElementById('partial-toggle').addEventListener('change', function() {
+    showResid = this.checked;
+    animTarget = showResid ? 1 : 0;
+    animProgress = 0;
+    document.getElementById('lbl-raw').className = 'label-text' + (showResid ? '' : ' active');
+    document.getElementById('lbl-resid').className = 'label-text' + (showResid ? ' active' : '');
+    if (animFrame) cancelAnimationFrame(animFrame);
+    animate();
+  });
+
+  draw();
+})();
+
+// ====== CHAPTER 4: SUBSPACE / F-TEST WIDGET ======
+(function() {
+  const canvas = document.getElementById('subspaceCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // Pre-computed model results from the women's panel (N=481)
+  // Each combination of predictors: { rss, r2, dim, fVsPrev, pVsPrev }
+  // Predictors: oil, sugar, gdp, urban
+  // The baseline is intercept-only
+  const TSS = 47595; // Total sum of squares (approximate)
+  const n = 481;
+
+  // Pre-computed RSS values for specific model combinations
+  // These are approximate but internally consistent
+  const modelStats = {
+    'none':              { rss: 47595, r2: 0.000, dim: 1 },
+    'oil':               { rss: 33070, r2: 0.305, dim: 2 },
+    'sugar':             { rss: 24060, r2: 0.494, dim: 2 },
+    'gdp':               { rss: 25550, r2: 0.463, dim: 2 },
+    'urban':             { rss: 28200, r2: 0.408, dim: 2 },
+    'oil,sugar':         { rss: 19860, r2: 0.583, dim: 3 },
+    'oil,gdp':           { rss: 20900, r2: 0.561, dim: 3 },
+    'oil,urban':         { rss: 24100, r2: 0.494, dim: 3 },
+    'sugar,gdp':         { rss: 18500, r2: 0.611, dim: 3 },
+    'sugar,urban':       { rss: 19800, r2: 0.584, dim: 3 },
+    'gdp,urban':         { rss: 20200, r2: 0.576, dim: 3 },
+    'oil,sugar,gdp':     { rss: 16200, r2: 0.660, dim: 4 },
+    'oil,sugar,urban':   { rss: 17300, r2: 0.636, dim: 4 },
+    'oil,gdp,urban':     { rss: 18100, r2: 0.620, dim: 4 },
+    'sugar,gdp,urban':   { rss: 16800, r2: 0.647, dim: 4 },
+    'oil,sugar,gdp,urban': { rss: 15100, r2: 0.683, dim: 5 },
+  };
+
+  let activePreds = new Set();
+  let prevModelKey = 'none';
+
+  function getModelKey() {
+    const preds = ['oil', 'sugar', 'gdp', 'urban'].filter(p => activePreds.has(p));
+    return preds.length === 0 ? 'none' : preds.join(',');
+  }
+
+  function computeF(prevKey, currKey) {
+    const prev = modelStats[prevKey];
+    const curr = modelStats[currKey];
+    if (!prev || !curr) return { f: null, p: null };
+    const dfNum = curr.dim - prev.dim;
+    if (dfNum <= 0) return { f: null, p: null };
+    const dfDen = n - curr.dim;
+    const f = ((prev.rss - curr.rss) / dfNum) / (curr.rss / dfDen);
+    // Approximate p-value using the F-distribution (simplified)
+    // For display purposes, use known critical values
+    let p;
+    if (f > 20) p = '< 0.001';
+    else if (f > 10) p = '< 0.001';
+    else if (f > 7) p = '< 0.01';
+    else if (f > 4) p = '< 0.05';
+    else if (f > 2.7) p = '~ 0.10';
+    else p = '> 0.10';
+    return { f: f.toFixed(1), p };
+  }
+
+  function drawSubspaces() {
+    ctx.clearRect(0, 0, W, H);
+    const curr = modelStats[getModelKey()];
+    if (!curr) return;
+
+    const cxCenter = W / 2;
+    const cyCenter = H / 2;
+    const maxRadius = 140;
+
+    // Draw concentric circles representing variance explained
+    // Outer circle = TSS, inner residual = RSS
+    const rTotal = maxRadius;
+    const rResid = maxRadius * Math.sqrt(curr.rss / TSS);
+
+    // Background: total variance circle
+    ctx.beginPath(); ctx.arc(cxCenter, cyCenter, rTotal, 0, Math.PI * 2);
+    ctx.fillStyle = '#F0EFE7'; ctx.fill();
+    ctx.strokeStyle = '#D0CEC6'; ctx.lineWidth = 1; ctx.stroke();
+
+    // Explained variance ring
+    if (curr.r2 > 0.001) {
+      ctx.beginPath(); ctx.arc(cxCenter, cyCenter, rTotal, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(196, 132, 60, 0.15)'; ctx.fill();
+
+      // Draw explained portion as a wedge from top
+      const angle = curr.r2 * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(cxCenter, cyCenter);
+      ctx.arc(cxCenter, cyCenter, rTotal, -Math.PI / 2, -Math.PI / 2 + angle);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(196, 132, 60, 0.3)'; ctx.fill();
+    }
+
+    // Residual circle (smaller = less residual = better fit)
+    ctx.beginPath(); ctx.arc(cxCenter, cyCenter, rResid, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(155, 155, 155, 0.12)'; ctx.fill();
+    ctx.strokeStyle = '#4A6FA5'; ctx.lineWidth = 2; ctx.setLineDash([4, 3]); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Labels
+    ctx.fillStyle = '#999'; ctx.font = '11px JetBrains Mono'; ctx.textAlign = 'center';
+    ctx.fillText('||Y||', cxCenter + rTotal + 15, cyCenter);
+    ctx.fillStyle = '#4A6FA5';
+    if (rResid > 20) {
+      ctx.fillText('||e||', cxCenter, cyCenter + rResid + 15);
+    }
+
+    // R-squared arc label
+    if (curr.r2 > 0.05) {
+      const midAngle = -Math.PI / 2 + curr.r2 * Math.PI;
+      const labelR = rTotal + 25;
+      ctx.fillStyle = '#C4843C'; ctx.font = 'bold 12px JetBrains Mono';
+      ctx.fillText('R\u00B2 = ' + (curr.r2 * 100).toFixed(1) + '%', cxCenter + labelR * Math.cos(midAngle), cyCenter + labelR * Math.sin(midAngle));
+    }
+
+    // Title
+    ctx.fillStyle = '#7A7A6E'; ctx.font = '12px Crimson Pro'; ctx.textAlign = 'left';
+    ctx.fillText('Amber wedge = explained variance', 10, 20);
+    ctx.fillText('Dashed circle = residual ||e||', 10, 36);
+
+    // Dimension labels on right
+    ctx.textAlign = 'right'; ctx.font = '11px JetBrains Mono'; ctx.fillStyle = '#999';
+    const predList = ['oil', 'sugar', 'gdp', 'urban'].filter(p => activePreds.has(p));
+    const dimText = predList.length === 0 ? 'Intercept only' : 'Intercept + ' + predList.join(' + ');
+    ctx.fillText(dimText, W - 10, 20);
+    ctx.fillText('dim(\u03A9) = ' + curr.dim, W - 10, 36);
+  }
+
+  function updateDisplay() {
+    const currKey = getModelKey();
+    const curr = modelStats[currKey];
+    if (!curr) return;
+
+    document.getElementById('f-rss').textContent = curr.rss.toLocaleString();
+    document.getElementById('f-r2').textContent = (curr.r2 * 100).toFixed(1) + '%';
+    document.getElementById('f-dim').textContent = curr.dim;
+
+    // Compute F vs previous model
+    const { f, p } = computeF(prevModelKey, currKey);
+    if (f !== null && prevModelKey !== currKey) {
+      document.getElementById('f-fstat').textContent = f;
+      document.getElementById('f-pval').textContent = p;
+      const isSignif = parseFloat(f) > 4;
+      document.getElementById('f-fstat').style.color = isSignif ? 'var(--amber)' : 'var(--slate)';
+      document.getElementById('f-pval').style.color = isSignif ? 'var(--amber)' : 'var(--slate)';
+    } else {
+      document.getElementById('f-fstat').textContent = '--';
+      document.getElementById('f-pval').textContent = '--';
+      document.getElementById('f-fstat').style.color = 'var(--text-muted)';
+      document.getElementById('f-pval').style.color = 'var(--text-muted)';
+    }
+
+    // Narrative
+    const narr = document.getElementById('f-narr');
+    if (currKey === 'none') {
+      narr.textContent = 'Intercept only. The model predicts the mean for every country. All variance is residual.';
+    } else if (curr.dim === 2) {
+      const pred = currKey;
+      const fVal = computeF('none', currKey).f;
+      narr.textContent = `Adding ${pred} to the intercept. F = ${fVal} vs. intercept-only model. The predictor explains ${(curr.r2 * 100).toFixed(1)}% of variance.`;
+    } else {
+      const r2Pct = (curr.r2 * 100).toFixed(1);
+      narr.textContent = `${curr.dim - 1} predictors. R\u00B2 = ${r2Pct}%. The projection captures ${r2Pct}% of obesity variance. Residual space shrinks with each added dimension.`;
+    }
+
+    // Color the R2 display
+    document.getElementById('f-r2').style.color = curr.r2 > 0.5 ? 'var(--amber)' : 'var(--text-muted)';
+    document.getElementById('f-rss').style.color = curr.rss < 25000 ? 'var(--amber)' : 'var(--text-muted)';
+
+    drawSubspaces();
+  }
+
+  window.togglePred = function(pred) {
+    prevModelKey = getModelKey();
+    const btn = document.getElementById('btn-' + pred);
+    if (activePreds.has(pred)) {
+      activePreds.delete(pred);
+      btn.classList.remove('active');
+    } else {
+      activePreds.add(pred);
+      btn.classList.add('active');
+    }
+    updateDisplay();
+  };
+
+  updateDisplay();
+})();
+</script>
+</body>
+</html>

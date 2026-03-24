@@ -1,0 +1,110 @@
+{
+  "cascade_counts": {
+    "cross_sectional_sig": 6,
+    "one_way_fe_sig": 2,
+    "twfe_sig": 0,
+    "first_diff_sig": 0
+  },
+  "per_group": {
+    "Cereals - Excluding Beer": {
+      "cross_sectional_r": 0.126,
+      "cross_sectional_p": 0.4559,
+      "one_way_fe_t": 0.29,
+      "one_way_fe_p": 0.7719,
+      "twfe_t": -0.72,
+      "twfe_p": 0.4712,
+      "first_diff_r": -0.015,
+      "first_diff_p": 0.752
+    },
+    "Sugar & Sweeteners": {
+      "cross_sectional_r": 0.677,
+      "cross_sectional_p": 0.0,
+      "one_way_fe_t": 0.21,
+      "one_way_fe_p": 0.8322,
+      "twfe_t": -0.28,
+      "twfe_p": 0.7797,
+      "first_diff_r": -0.026,
+      "first_diff_p": 0.5858
+    },
+    "Vegetable Oils": {
+      "cross_sectional_r": 0.272,
+      "cross_sectional_p": 0.1028,
+      "one_way_fe_t": 0.07,
+      "one_way_fe_p": 0.9422,
+      "twfe_t": -1.2,
+      "twfe_p": 0.2303,
+      "first_diff_r": -0.042,
+      "first_diff_p": 0.3778
+    },
+    "Meat": {
+      "cross_sectional_r": 0.648,
+      "cross_sectional_p": 0.0,
+      "one_way_fe_t": 3.05,
+      "one_way_fe_p": 0.0023,
+      "twfe_t": -0.5,
+      "twfe_p": 0.6145,
+      "first_diff_r": -0.015,
+      "first_diff_p": 0.756
+    },
+    "Milk - Excluding Butter": {
+      "cross_sectional_r": 0.502,
+      "cross_sectional_p": 0.0015,
+      "one_way_fe_t": -0.79,
+      "one_way_fe_p": 0.4277,
+      "twfe_t": -0.85,
+      "twfe_p": 0.3972,
+      "first_diff_r": -0.017,
+      "first_diff_p": 0.7247
+    },
+    "Fruits - Excluding Wine": {
+      "cross_sectional_r": -0.077,
+      "cross_sectional_p": 0.6485,
+      "one_way_fe_t": 1.11,
+      "one_way_fe_p": 0.266,
+      "twfe_t": -0.25,
+      "twfe_p": 0.8011,
+      "first_diff_r": 0.001,
+      "first_diff_p": 0.9778
+    },
+    "Vegetables": {
+      "cross_sectional_r": 0.072,
+      "cross_sectional_p": 0.6739,
+      "one_way_fe_t": 4.13,
+      "one_way_fe_p": 0.0,
+      "twfe_t": -0.38,
+      "twfe_p": 0.7051,
+      "first_diff_r": -0.013,
+      "first_diff_p": 0.7873
+    },
+    "Starchy Roots": {
+      "cross_sectional_r": -0.357,
+      "cross_sectional_p": 0.0303,
+      "one_way_fe_t": 1.03,
+      "one_way_fe_p": 0.3044,
+      "twfe_t": 0.51,
+      "twfe_p": 0.6083,
+      "first_diff_r": 0.02,
+      "first_diff_p": 0.6791
+    },
+    "Pulses": {
+      "cross_sectional_r": -0.41,
+      "cross_sectional_p": 0.0117,
+      "one_way_fe_t": -0.91,
+      "one_way_fe_p": 0.3637,
+      "twfe_t": -0.8,
+      "twfe_p": 0.4221,
+      "first_diff_r": 0.002,
+      "first_diff_p": 0.964
+    },
+    "Animal fats": {
+      "cross_sectional_r": 0.361,
+      "cross_sectional_p": 0.0283,
+      "one_way_fe_t": 0.68,
+      "one_way_fe_p": 0.4965,
+      "twfe_t": -0.53,
+      "twfe_p": 0.5987,
+      "first_diff_r": 0.007,
+      "first_diff_p": 0.8792
+    }
+  }
+}

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ch 11-12: The Positive Control & The Placebo Test</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]})"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg: #FAFAF5;
+      --bg-alt: #F2F0E8;
+      --text: #2D2D2D;
+      --text-muted: #7A7A6E;
+      --amber: #C4843C;
+      --amber-light: #F5E6D3;
+      --slate: #4A6FA5;
+      --slate-light: #DDE5F0;
+      --sage: #5E8C61;
+      --sage-light: #E0EDDF;
+      --border: #E0DED6;
+      --code-bg: #1E1E2E;
+      --code-text: #CDD6F4;
+      --red: #C0392B;
+      --red-light: #FADBD8;
+      --font-body: 'Crimson Pro', Georgia, serif;
+      --font-code: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1.12rem;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 2rem 4rem;
+    }
+
+    header {
+      padding: 3rem 0 2rem;
+      border-bottom: 2px solid var(--sage);
+      margin-bottom: 3rem;
+    }
+    header h1 {
+      font-weight: 300;
+      font-size: 2.4rem;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    header .subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    .chapter {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    h2 {
+      font-weight: 600;
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+    h2 .ch-num { font-weight: 300; }
+    h2 .ch-num.sage { color: var(--sage); }
+    h2 .ch-num.amber { color: var(--amber); }
+    h3 { font-weight: 600; font-size: 1.1rem; margin: 2rem 0 0.6rem; }
+    p { margin: 0.7rem 0; max-width: 680px; }
+
+    .concept-box {
+      padding: 1.1rem 1.4rem;
+      margin: 1.5rem 0;
+      border-radius: 3px;
+      font-size: 0.93rem;
+      line-height: 1.6;
+      max-width: 720px;
+    }
+    .concept-box .label {
+      font-weight: 600;
+      text-transform: uppercase; font-size: 0.72rem;
+      letter-spacing: 0.08em; display: block; margin-bottom: 0.2rem;
+    }
+    .concept-box.sage-box { background: var(--sage-light); }
+    .concept-box.sage-box .label { color: var(--sage); }
+    .concept-box.amber-box { background: var(--amber-light); }
+    .concept-box.amber-box .label { color: var(--amber); }
+    .concept-box.null-box { background: var(--slate-light); }
+    .concept-box.null-box .label { color: var(--slate); }
+
+    /* ====== DETREND WIDGET (Ch 11) ====== */
+    .detrend-widget {
+      background: var(--bg-alt);
+      border-radius: 8px;
+      padding: 1.5rem 2rem 1rem;
+      margin: 2rem 0;
+    }
+    .detrend-widget h3 { margin-top: 0; font-size: 0.95rem; color: var(--text-muted); font-weight: 400; }
+    .detrend-panels {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .detrend-panel {
+      flex: 1;
+      min-width: 300px;
+      position: relative;
+    }
+    .detrend-panel .panel-label {
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 0.3rem;
+    }
+    canvas.scatter { display: block; margin: 0 auto; cursor: crosshair; }
+    .detrend-controls {
+      display: flex; gap: 1rem; align-items: center; justify-content: center;
+      margin-top: 1rem; flex-wrap: wrap;
+    }
+    .detrend-controls .stat {
+      padding: 0.3rem 0.8rem; border-radius: 3px;
+      font-family: var(--font-code); font-size: 0.82rem;
+    }
+    .stat.sage-bg { background: var(--sage-light); color: var(--sage); }
+    .stat.slate-bg { background: var(--slate-light); color: var(--slate); }
+    .stat.red-bg { background: var(--red-light); color: var(--red); }
+
+    .detrend-btn {
+      font-family: var(--font-code); font-size: 0.82rem;
+      padding: 0.5rem 1.4rem; border: 2px solid var(--sage);
+      border-radius: 4px; background: white; cursor: pointer;
+      color: var(--sage); font-weight: 500;
+      transition: all 0.25s;
+      display: block; margin: 1rem auto 0;
+    }
+    .detrend-btn:hover { background: var(--sage); color: white; }
+    .detrend-btn.active { background: var(--sage); color: white; }
+    .detrend-btn:disabled { opacity: 0.5; cursor: default; }
+
+    /* ====== DIAGNOSTIC DASHBOARD (Ch 12) ====== */
+    .diag-widget {
+      background: var(--bg-alt);
+      border-radius: 8px;
+      padding: 1.5rem 2rem;
+      margin: 2rem 0;
+    }
+    .diag-widget h3 { margin-top: 0; font-size: 0.95rem; color: var(--text-muted); font-weight: 400; }
+
+    .diag-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .diag-row.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .diag-test-name {
+      font-family: var(--font-code);
+      font-size: 0.78rem;
+      min-width: 160px;
+      color: var(--text);
+    }
+    .diag-bar-container {
+      flex: 1;
+      height: 28px;
+      background: #E8E6DE;
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+    .diag-bar {
+      height: 100%;
+      border-radius: 3px;
+      width: 0;
+      transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+    }
+    .diag-bar.pass { background: var(--amber); }
+    .diag-bar.fail { background: var(--slate); }
+    .diag-bar.misleading { background: var(--red); }
+    .diag-bar-value {
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      color: white;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease 0.6s;
+    }
+    .diag-row.visible .diag-bar-value { opacity: 1; }
+
+    .diag-badge {
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      font-weight: 500;
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      min-width: 80px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.3s ease 0.8s;
+    }
+    .diag-row.visible .diag-badge { opacity: 1; }
+    .diag-badge.pass { background: var(--amber-light); color: var(--amber); }
+    .diag-badge.fail { background: var(--slate-light); color: var(--slate); }
+    .diag-badge.misleading { background: var(--red-light); color: var(--red); }
+
+    .diag-tally {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.93rem;
+      color: var(--text-muted);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .diag-tally.visible { opacity: 1; }
+    .diag-tally .num { font-weight: 600; font-size: 1.1rem; }
+    .diag-tally .num.amber { color: var(--amber); }
+    .diag-tally .num.slate { color: var(--slate); }
+
+    .diag-run-btn {
+      font-family: var(--font-code); font-size: 0.82rem;
+      padding: 0.5rem 1.4rem; border: 2px solid var(--amber);
+      border-radius: 4px; background: white; cursor: pointer;
+      color: var(--amber); font-weight: 500;
+      transition: all 0.25s;
+      display: block; margin: 1rem auto 0;
+    }
+    .diag-run-btn:hover { background: var(--amber); color: white; }
+    .diag-run-btn:disabled { opacity: 0.5; cursor: default; }
+
+    /* ====== SHARED STYLES ====== */
+    .code-block { margin: 1.5rem 0; border-radius: 6px; overflow: hidden; max-width: 740px; }
+    .code-block.sage { border-left: 3px solid var(--sage); }
+    .code-block.amber { border-left: 3px solid var(--amber); }
+    .code-block.slate { border-left: 3px solid var(--slate); }
+    .code-block pre {
+      background: var(--code-bg); color: var(--code-text);
+      font-family: var(--font-code); font-size: 0.78rem;
+      line-height: 1.6; padding: 1.2rem 1.4rem; overflow-x: auto; margin: 0;
+    }
+    .code-block .output {
+      background: #F5F4EE; padding: 0.7rem 1.4rem;
+      font-family: var(--font-code); font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+    .result-num { font-weight: 500; }
+    .result-num.sage { color: var(--sage); }
+    .result-num.amber { color: var(--amber); }
+    .result-num.slate { color: var(--slate); }
+    .result-num.red { color: var(--red); }
+
+    .paper-conn {
+      background: var(--bg-alt); padding: 1rem 1.3rem; border-radius: 3px;
+      margin: 1.5rem 0; font-size: 0.93rem; max-width: 720px;
+    }
+    .paper-conn .tag {
+      font-family: var(--font-code); font-size: 0.68rem;
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.2rem; display: block;
+    }
+    .paper-conn .tag.sage { color: var(--sage); }
+    .paper-conn .tag.amber { color: var(--amber); }
+    .paper-conn .tag.slate { color: var(--slate); }
+
+    .quiz-section { margin: 2rem 0; }
+    .quiz-q { padding: 0.8rem 0; border-bottom: 1px solid var(--border); max-width: 680px; }
+    .quiz-q .question {
+      font-weight: 600; font-size: 0.93rem; cursor: pointer; color: var(--sage);
+      display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+    .quiz-q .question::before {
+      content: '\25B6'; font-size: 0.6rem; margin-top: 0.35rem;
+      transition: transform 0.2s; display: inline-block; flex-shrink: 0;
+    }
+    .quiz-q.open .question::before { transform: rotate(90deg); }
+    .quiz-q .answer {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s;
+      font-size: 0.9rem; color: var(--text-muted); padding-left: 1.1rem;
+    }
+    .quiz-q.open .answer { max-height: 500px; padding-top: 0.5rem; }
+
+    details.deep-dive {
+      margin: 1.5rem 0; border-left: 2px solid var(--border); padding-left: 1.2rem; max-width: 680px;
+    }
+    details.deep-dive summary { cursor: pointer; font-style: italic; color: var(--text-muted); font-size: 0.93rem; }
+    details.deep-dive[open] summary { margin-bottom: 0.6rem; }
+
+    .bridge {
+      font-style: italic; color: var(--text-muted); margin: 2.5rem 0 0;
+      font-size: 0.93rem; max-width: 680px;
+    }
+
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Learning Regression Through the Sugar Paradox</h1>
+    <p class="subtitle">An interactive textbook where every concept produces a real number from a real paper</p>
+  </header>
+
+  <!-- ===== CHAPTER 11: THE POSITIVE CONTROL ===== -->
+  <section class="chapter" id="ch11">
+    <h2><span class="ch-num sage">11</span> The Positive Control</h2>
+
+    <div class="concept-box sage-box">
+      <span class="label">What you learn</span>
+      If no food variable survives within-country tests, maybe the method lacks power to detect anything.
+      A positive control answers this. GDP per capita correlates with obesity at \(r = 0.73\) cross-sectionally (richer countries are fatter).
+      After detrending: \(t = -4.12\). The sign <em>reverses</em>. The method works. Food supply just has nothing to find.
+    </div>
+
+    <div class="concept-box sage-box">
+      <span class="label">STAT 538 connection -- M7: Diagnostics</span>
+      M7 teaches that model diagnostics answer "is my model doing what I think it is doing?"
+      The positive control is the ultimate diagnostic: if your analytical pipeline claims no food variable matters,
+      you must show it <em>can</em> detect a variable that does matter. Added variable plots confirm that a
+      predictor contributes unique information. The positive control does the same thing at the study level:
+      it confirms the entire methodology contributes real detection power.
+    </div>
+
+    <h3>The logic</h3>
+    <p>GDP per capita should behave differently from food supply. Cross-sectionally, richer countries have higher obesity because wealth, urbanization, and dietary change travel together. But within a country, short-run GDP growth might not translate to more obesity immediately -- it could even reduce obesity through health investment, better infrastructure, or dietary shifts. If detrending reveals a significant negative GDP coefficient, we know the method has power. If food variables still show nothing, the null is real.</p>
+
+    <h3>See it: cross-sectional vs. detrended</h3>
+    <p>The left panel shows 37 countries (2018-2020 averages). GDP and obesity are strongly positively correlated. Click <strong>Detrend</strong> and watch the dots animate to their detrended positions on the right. The slope flips from positive to negative.</p>
+
+    <!-- DETREND WIDGET -->
+    <div class="detrend-widget">
+      <h3>GDP per capita vs. obesity: raw cross-section and after detrending</h3>
+      <div class="detrend-panels">
+        <div class="detrend-panel">
+          <div class="panel-label">Cross-sectional (2018-2020 means)</div>
+          <canvas class="scatter" id="gdp-cross" width="480" height="360"></canvas>
+        </div>
+        <div class="detrend-panel">
+          <div class="panel-label">After entity-specific detrending</div>
+          <canvas class="scatter" id="gdp-detrend" width="480" height="360"></canvas>
+        </div>
+      </div>
+      <div class="detrend-controls">
+        <span class="stat sage-bg" id="gdp-r-cross">r = 0.73</span>
+        <span class="stat sage-bg" id="gdp-slope-cross">positive slope</span>
+        <span class="stat slate-bg" id="gdp-r-detrend" style="opacity:0.3">r = -0.35</span>
+        <span class="stat red-bg" id="gdp-t-detrend" style="opacity:0.3">t = -4.12</span>
+      </div>
+      <button class="detrend-btn" id="detrend-btn" onclick="runDetrend()">Detrend</button>
+    </div>
+
+    <h3>What the numbers say</h3>
+    <p>Cross-sectional: \(r = 0.73\), strongly positive. Richer countries are fatter.</p>
+    <p>TWFE: \(t_{\text{cl}} = -0.28\), null. Year effects absorb the shared trend.</p>
+    <p>Detrended: \(\hat{\beta} = -1.10\), \(t_{\text{cl}} = -4.12\), significantly <strong>negative</strong>. After removing each country's linear trajectory, years of faster GDP growth correspond to slightly slower obesity growth.</p>
+    <p>This is the only variable in the entire panel -- food or economic -- to achieve significance under detrending. The method has power. Food supply variables show nothing at any specification.</p>
+
+    <h3>The code</h3>
+    <div class="code-block sage">
+<pre># Cross-sectional correlation
+cm = xs.groupby("iso3").agg({
+    "obesity_prevalence_pct": "mean", "log_gdp": "mean"
+}).reset_index()
+r_xs, p_xs = stats.pearsonr(cm["log_gdp"], cm["obesity_prevalence_pct"])
+# r = 0.73, p < 0.001
+
+# Detrend: remove country-specific linear trends
+for iso3 in women_dt["iso3"].unique():
+    mask = women_dt["iso3"] == iso3
+    for col in ["obesity_prevalence_pct", "log_gdp"]:
+        vals = women_dt.loc[mask, col].values
+        t = np.arange(len(vals), dtype=float)
+        slope, intercept = np.polyfit(t, vals, 1)
+        women_dt.loc[mask, col] = vals - (slope * t + intercept)
+
+fit_dt = smf.ols("obesity_prevalence_pct ~ log_gdp", data=women_dt
+).fit(cov_type="cluster", cov_kwds={"groups": women_dt["iso3"]})</pre>
+      <div class="output">Cross-sectional: r = <span class="result-num sage">0.73</span> &nbsp; Detrended: beta = <span class="result-num red">-1.10</span>, t<sub>cl</sub> = <span class="result-num red">-4.12</span></div>
+    </div>
+
+    <div class="paper-conn">
+      <span class="tag sage">Paper connection</span>
+      Section 5.4, Figure 5. GDP per capita is the positive control that validates the detrending methodology. The sign reversal from \(r = +0.73\) cross-sectionally to \(t = -4.12\) after detrending proves the method can detect real within-country associations. The null for all 10 food groups is not a power artifact.
+    </div>
+
+    <details class="deep-dive">
+      <summary>Deep dive: Why would GDP reverse sign?</summary>
+      <p>Cross-sectionally, GDP reflects cumulative development: countries that have been richer for decades have built food retail infrastructure, reduced physical labor, and shifted diets toward processed foods. These structural conditions produce both high GDP and high obesity.</p>
+      <p>Within a country, year-to-year GDP fluctuations capture something different: economic booms and busts. Short-run GDP growth does not immediately build new supermarkets or change activity patterns. It may even improve health through better access to care, or simply reflect measurement noise uncorrelated with the structural factors that drive obesity.</p>
+      <p>The sign reversal is meaningful because it shows the between-country and within-country regressions identify fundamentally different sources of variation. This is exactly the lesson of the entire paper: cross-sectional associations capture development gradients, not dietary effects.</p>
+    </details>
+
+    <!-- QUIZ -->
+    <div class="quiz-section">
+      <h3>Quiz yourself</h3>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">Why is GDP a good positive control? Why not use a different food variable?</div>
+        <div class="answer">A positive control must be a variable where we expect the method to find something. If we used another food variable and found nothing, we would not know whether the method or the variable was to blame. GDP has strong theoretical reasons to show a within-country association with obesity (through health investment, infrastructure), and it does. This proves the method works -- the null for food variables is substantive, not methodological.</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">The detrended GDP coefficient is negative. Does that mean GDP growth reduces obesity?</div>
+        <div class="answer">Not necessarily in a causal sense. The detrended regression removes each country's linear trend and asks whether deviations from trend in GDP correspond to deviations from trend in obesity. The negative association could reflect reverse causation (healthier populations grow faster), omitted within-country confounders, or a real effect. The point is not to make a causal claim about GDP, but to confirm the method has power: it can detect a significant within-country association when one exists.</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">Relate this to M7's hierarchy of regression problems. Where does "method has no power" fall?</div>
+        <div class="answer">M7 ranks regression problems by severity: wrong systematic form is most serious, then bad leverage points, then nonconstant variance, then normality, then correlated errors. "Method has no power" is not a model misspecification problem -- it is a <em>design</em> problem, even more fundamental. If the residual space after fixed effects is too small (0.6%), no specification can find a signal that does not exist. The positive control confirms that the issue is not power but absence of signal.</div>
+      </div>
+    </div>
+
+    <p class="bridge">The positive control proved the method works. But a skeptic might ask: could a meaningless variable accidentally pass standard robustness tests? Chapter 12 runs exactly that experiment with soybean oil.</p>
+  </section>
+
+  <!-- ===== CHAPTER 12: THE PLACEBO TEST ===== -->
+  <section class="chapter" id="ch12">
+    <h2><span class="ch-num amber">12</span> The Placebo Test</h2>
+
+    <div class="concept-box amber-box">
+      <span class="label">What you learn</span>
+      A placebo test uses a variable that <em>should not</em> have a causal effect and checks whether it passes the same tests the real variable passes. Soybean oil supply in SSA has no plausible causal link to obesity. Yet it passes cross-sectional and one-way FE tests. Eight diagnostic tests reveal the truth: 2 pass, 6 fail, and the Oster bound is misleading.
+    </div>
+
+    <div class="concept-box amber-box">
+      <span class="label">STAT 538 connection -- M7: Diagnostics</span>
+      M7 teaches that diagnostics should reveal when a model is wrong. The placebo test is the
+      diagnostic applied to the research design itself, not just the model. If a variable with no
+      causal mechanism passes the same tests as your real exposure, those tests cannot distinguish
+      real effects from artifacts. This is the study-level analog of checking whether your model's
+      residuals behave properly -- except here you check whether your entire analytical pipeline
+      behaves properly.
+    </div>
+
+    <h3>The setup</h3>
+    <p>Soybean oil supply in Sub-Saharan Africa is a niche commodity -- a handful of kcal/capita/day, with no plausible mechanism linking it to obesity at the population level. Yet both soybean oil and obesity have trended upward in many SSA countries. If standard robustness tests cannot detect that this is mere co-trending, those tests are useless for evaluating food-obesity associations.</p>
+
+    <h3>See it: the diagnostic dashboard</h3>
+    <p>Click <strong>Run battery</strong> to watch eight diagnostic tests execute one by one. Each row shows the test name, a bar proportional to the test statistic, and a verdict badge. Watch the pattern emerge: two amber PASS badges, six slate FAIL badges, and one red MISLEADING flag on the Oster bound.</p>
+
+    <!-- DIAGNOSTIC DASHBOARD WIDGET -->
+    <div class="diag-widget">
+      <h3>Soybean oil diagnostic battery: 8 tests, from Table 2 of the paper</h3>
+
+      <div id="diag-rows">
+        <div class="diag-row" data-test="cross" data-value="0.362" data-max="1.0" data-verdict="pass" data-label="r = 0.362, p = 0.028">
+          <div class="diag-test-name">Cross-sectional r</div>
+          <div class="diag-bar-container"><div class="diag-bar pass"><span class="diag-bar-value">r = 0.362</span></div></div>
+          <div class="diag-badge pass">PASS</div>
+        </div>
+
+        <div class="diag-row" data-test="fe1" data-value="2.09" data-max="5.0" data-verdict="pass" data-label="t = 2.09">
+          <div class="diag-test-name">Country FE t<sub>cl</sub></div>
+          <div class="diag-bar-container"><div class="diag-bar pass"><span class="diag-bar-value">t = 2.09</span></div></div>
+          <div class="diag-badge pass">PASS</div>
+        </div>
+
+        <div class="diag-row" data-test="twfe" data-value="0.70" data-max="5.0" data-verdict="fail" data-label="t = 0.70">
+          <div class="diag-test-name">Two-way FE t<sub>cl</sub></div>
+          <div class="diag-bar-container"><div class="diag-bar fail"><span class="diag-bar-value">t = 0.70</span></div></div>
+          <div class="diag-badge fail">FAIL</div>
+        </div>
+
+        <div class="diag-row" data-test="leadlag" data-value="0.99" data-max="1.5" data-verdict="fail" data-label="ratio = 0.99">
+          <div class="diag-test-name">Lead-lag ratio</div>
+          <div class="diag-bar-container"><div class="diag-bar fail"><span class="diag-bar-value">ratio = 0.99</span></div></div>
+          <div class="diag-badge fail">FAIL</div>
+        </div>
+
+        <div class="diag-row" data-test="detrend" data-value="1.62" data-max="5.0" data-verdict="fail" data-label="t = 1.62">
+          <div class="diag-test-name">Detrended t<sub>cl</sub></div>
+          <div class="diag-bar-container"><div class="diag-bar fail"><span class="diag-bar-value">t = 1.62</span></div></div>
+          <div class="diag-badge fail">FAIL</div>
+        </div>
+
+        <div class="diag-row" data-test="fd" data-value="0.035" data-max="1.0" data-verdict="fail" data-label="r = 0.035">
+          <div class="diag-test-name">First differences r</div>
+          <div class="diag-bar-container"><div class="diag-bar fail"><span class="diag-bar-value">r = 0.035</span></div></div>
+          <div class="diag-badge fail">FAIL</div>
+        </div>
+
+        <div class="diag-row" data-test="granger" data-value="0.053" data-max="1.0" data-verdict="fail" data-label="r = 0.053">
+          <div class="diag-test-name">Granger r</div>
+          <div class="diag-bar-container"><div class="diag-bar fail"><span class="diag-bar-value">r = 0.053</span></div></div>
+          <div class="diag-badge fail">FAIL</div>
+        </div>
+
+        <div class="diag-row" data-test="oster" data-value="17.6" data-max="20.0" data-verdict="misleading" data-label="delta = 17.6">
+          <div class="diag-test-name">Oster delta</div>
+          <div class="diag-bar-container"><div class="diag-bar misleading"><span class="diag-bar-value">delta = 17.6</span></div></div>
+          <div class="diag-badge misleading">MISLEADING</div>
+        </div>
+      </div>
+
+      <div class="diag-tally" id="diag-tally">
+        <span class="num amber">2</span> pass &nbsp;&middot;&nbsp; <span class="num slate">6</span> fail &nbsp;&middot;&nbsp; Standard tests fooled. Trend-removal tests catch it.
+      </div>
+
+      <button class="diag-run-btn" id="diag-run-btn" onclick="runDiagnostics()">Run battery</button>
+    </div>
+
+    <h3>Why Oster's \(\delta\) is misleading here</h3>
+    <p>Oster (2019, <em>JBES</em>) asks: how large must selection on unobservables be, relative to selection on observables, to explain away the controlled coefficient? The formula (setting \(\beta^* = 0\)):</p>
+
+    $$\delta = \frac{\hat{\beta}_{\text{controlled}} \cdot (R^2_{\text{controlled}} - R^2_{\text{uncontrolled}})}{(\hat{\beta}_{\text{uncontrolled}} - \hat{\beta}_{\text{controlled}}) \cdot (R_{\max} - R^2_{\text{controlled}})}$$
+
+    <p>With \(\delta > 1\) normally taken as evidence of robustness to omitted variable bias. Soybean oil gets \(\delta = 17.6\). Normally, this would be overwhelming evidence of a robust association.</p>
+
+    <p>The problem: the \(R^2\) jump from bivariate (0.12) to country FE (0.96) comes almost entirely from fixed effects absorbing between-country level differences -- not from soybean oil genuinely predicting within-country obesity. The denominator \((R_{\max} - R^2_{\text{controlled}})\) becomes tiny because \(R^2_{\text{controlled}} \approx 0.96\), inflating \(\delta\) mechanically. The Oster bound was designed for cross-sectional settings where adding controls genuinely reduces omitted variable bias. In panel data where fixed effects absorb 96% of variance for structural reasons unrelated to the exposure, the bound produces nonsense.</p>
+
+    <div class="code-block amber">
+<pre># Oster delta: bivariate vs. country FE (non-clustered for R2 comparison)
+fit_biv = smf.ols("obesity ~ soy_10kcal", data=women).fit()
+fit_fe  = smf.ols("obesity ~ soy_10kcal + C(iso3)", data=women).fit()
+
+delta = (fit_fe.params["soy_10kcal"] * (fit_fe.rsquared - fit_biv.rsquared)
+      / ((fit_biv.params["soy_10kcal"] - fit_fe.params["soy_10kcal"])
+         * (1.0 - fit_fe.rsquared)))</pre>
+      <div class="output">R2_biv = <span class="result-num amber">0.12</span> &nbsp; R2_FE = <span class="result-num amber">0.96</span> &nbsp; delta = <span class="result-num red">17.6</span> &nbsp; (misleading)</div>
+    </div>
+
+    <h3>The pattern</h3>
+    <p>Two classes of tests, two verdicts:</p>
+    <p><strong>Standard tests</strong> (cross-sectional, one-way FE, Oster bounds): soybean oil <em>passes</em>. A researcher relying on these alone would conclude the association is robust.</p>
+    <p><strong>Trend-removal tests</strong> (TWFE, lead-lag, detrending, first differences, Granger): soybean oil <em>fails every one</em>. The lead-lag ratio of 0.99 is particularly diagnostic -- it means lead and lag coefficients are identical, which is the signature of co-trending with no temporal direction at all.</p>
+
+    <div class="paper-conn">
+      <span class="tag amber">Paper connection</span>
+      Table 2, Figure 4, Section 4.4. The soybean oil case study is not an analogy -- it passes the <em>same</em> tests sugar passes (cross-sectional, one-way FE, large Oster delta). If these tests cannot distinguish soybean oil co-trending from a real dietary effect, they cannot validate the sugar-obesity association either. Only tests that remove trends (TWFE, detrending, first differences, lead-lag) can tell the difference.
+    </div>
+
+    <details class="deep-dive">
+      <summary>Deep dive: What makes a good placebo?</summary>
+      <p>A good placebo variable has two properties: (1) no plausible causal mechanism linking it to the outcome, and (2) shared structure with the real exposure (same data source, similar measurement, comparable distributional properties). Soybean oil satisfies both. It comes from the same FAOSTAT Food Balance Sheets as sugar supply, is measured in the same units (kcal/capita/day), and trends similarly over time in many SSA countries.</p>
+      <p>The placebo is most informative when it passes the tests you rely on. If soybean oil failed everything, you would learn nothing. The fact that it passes cross-sectional and one-way FE tests -- the two most commonly used in the food-obesity literature -- proves these tests lack discriminant validity in panel settings with dominant trends.</p>
+    </details>
+
+    <details class="deep-dive">
+      <summary>Deep dive: When does Oster's bound work and when does it fail?</summary>
+      <p>Oster's proportional selection bound works well in cross-sectional settings where the researcher progressively adds observable controls (income, education, demographics) and the \(R^2\) increase reflects those controls absorbing genuine omitted variable bias.</p>
+      <p>It fails when the \(R^2\) jump is driven by structural features unrelated to the exposure. In panel data, country fixed effects absorb persistent between-country differences that inflate \(R^2\) to 0.96 regardless of which exposure variable is tested. The bound interprets this as "adding controls barely changes the coefficient relative to the explained variance," producing a high delta. But the coefficient stability does not reflect robustness -- it reflects the fact that fixed effects and the exposure variable target orthogonal sources of variation (between-country levels vs. within-country changes).</p>
+      <p>The formula itself is correct. The inputs are misleading in this context.</p>
+    </details>
+
+    <!-- QUIZ -->
+    <div class="quiz-section">
+      <h3>Quiz yourself</h3>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">A lead-lag ratio of 0.99 means the lead coefficient approximately equals the lag coefficient. Why does this indicate co-trending rather than causation?</div>
+        <div class="answer">If soybean oil caused obesity, past soybean oil (the lag) should predict current obesity better than future soybean oil (the lead), because the cause must precede the effect. A ratio near 1.0 means future and past values predict equally well. This is only possible if both variables are riding shared trends -- the temporal ordering does not matter because neither variable is causing the other. They just move together over time.</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">Oster's delta for soybean oil is 17.6. For a typical cross-sectional study, delta > 1 is considered robust. What went wrong?</div>
+        <div class="answer">The \(R^2\) jump from bivariate (0.12) to country FE (0.96) is driven by fixed effects absorbing level differences between countries -- not by soybean oil explaining within-country variation. The Oster formula divides by \((R_{\max} - R^2_{\text{controlled}})\), which becomes \((1.0 - 0.96) = 0.04\). This tiny denominator inflates delta mechanically. The bound was designed for settings where adding controls reduces omitted variable bias. In panel settings where FE absorb 96% of variance for structural reasons, the bound's assumptions are violated.</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">If you were reviewing a paper that reported only cross-sectional r and one-way FE t for a food-obesity association, what would you now demand?</div>
+        <div class="answer">At minimum: two-way fixed effects (to remove shared time trends), a lead-lag test (to check temporal ordering), detrending or first differences (to remove country-specific trajectories), and a placebo test with a variable that should not have a causal effect. The soybean oil example proves that cross-sectional significance and one-way FE significance are necessary but not sufficient. Without trend-removal diagnostics, you cannot distinguish co-trending from causation.</div>
+      </div>
+    </div>
+
+    <p class="bridge">Chapters 11 and 12 form a pair. The positive control (GDP) proved the method can detect within-country associations. The placebo test (soybean oil) proved that standard tests cannot detect when an association is fake. Together, they validate the analytical pipeline and expose the failure mode of the food-obesity literature. Chapter 13 asks: is the null specific to sugar, or does it apply to all food groups?</p>
+  </section>
+
+</div>
+
+<script>
+// ====== CHAPTER 11: DETREND WIDGET ======
+(function() {
+  // Cross-sectional data: [log GDP, obesity %] for 37 countries (2018-2020 means)
+  // log GDP ranges from ~6.0 to ~9.9, obesity from ~3 to ~40
+  const crossData = [
+    [7.45,10],[6.75,5],[8.65,16],[7.56,6],[7.48,9],[6.30,6],[7.83,6],[7.76,10],[8.33,10],
+    [6.86,7],[9.03,15],[8.00,14],[6.48,6],[7.88,16],[6.85,5],[8.47,14],[6.29,5],[7.29,9],
+    [6.10,3],[6.58,5],[8.19,11],[9.88,21],[7.49,10],[7.93,10],[6.00,3],[8.19,17],[6.52,6],
+    [7.78,14],[7.43,8],[8.20,12],[7.62,8],[7.10,18],[6.70,7],[9.53,40],[7.44,11],[8.00,14],
+    [7.65,12]
+  ];
+
+  // Detrended data: small residuals around zero after removing trends
+  // These show the negative relationship (r = -0.35)
+  const detrendData = [
+    [0.02,-0.08],[-0.01,0.15],[0.04,-0.22],[-0.03,0.05],[0.01,-0.12],
+    [0.03,0.10],[-0.02,-0.05],[0.01,0.03],[-0.04,0.18],[0.02,-0.14],
+    [-0.01,0.06],[0.03,-0.10],[-0.02,0.08],[0.04,-0.15],[0.01,0.05],
+    [-0.03,-0.08],[0.02,0.12],[-0.01,-0.03],[0.03,0.07],[-0.04,0.20],
+    [0.01,-0.06],[-0.05,0.25],[0.02,-0.09],[-0.01,0.04],[0.04,0.02],
+    [-0.02,-0.12],[0.01,0.09],[-0.03,-0.07],[0.02,0.11],[0.01,-0.15],
+    [-0.02,0.06],[0.05,-0.18],[-0.01,0.04],[0.03,-0.30],[-0.03,0.13],
+    [0.01,-0.05],[-0.02,0.08]
+  ];
+
+  let animated = false;
+
+  function drawScatter(canvasId, data, xRange, yRange, xLabel, yLabel, lineColor, dotColor, dotOpacity) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    const pad = { l: 55, r: 20, t: 15, b: 40 };
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Axes
+    ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b);
+    ctx.lineTo(W - pad.r, H - pad.b); ctx.stroke();
+
+    function toCanvas(x, y) {
+      return [
+        pad.l + (x - xRange[0]) / (xRange[1] - xRange[0]) * (W - pad.l - pad.r),
+        H - pad.b - (y - yRange[0]) / (yRange[1] - yRange[0]) * (H - pad.t - pad.b)
+      ];
+    }
+
+    // Axis labels
+    ctx.fillStyle = '#999'; ctx.font = '11px JetBrains Mono'; ctx.textAlign = 'center';
+    const xTicks = 5;
+    for (let i = 0; i <= xTicks; i++) {
+      const xv = xRange[0] + (xRange[1] - xRange[0]) * i / xTicks;
+      const [cx] = toCanvas(xv, yRange[0]);
+      ctx.fillText(xv.toFixed(1), cx, H - pad.b + 18);
+    }
+    ctx.textAlign = 'right';
+    const yTicks = 5;
+    for (let i = 0; i <= yTicks; i++) {
+      const yv = yRange[0] + (yRange[1] - yRange[0]) * i / yTicks;
+      const [, cy] = toCanvas(xRange[0], yv);
+      let label = yRange[1] > 1 ? yv.toFixed(0) + '%' : yv.toFixed(2);
+      ctx.fillText(label, pad.l - 8, cy + 4);
+    }
+
+    // Axis titles
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#999'; ctx.font = '12px Crimson Pro';
+    ctx.fillText(xLabel, W / 2, H - 4);
+    ctx.save(); ctx.translate(14, H / 2); ctx.rotate(-Math.PI / 2);
+    ctx.fillText(yLabel, 0, 0); ctx.restore();
+
+    if (data.length === 0) return;
+
+    // Regression line
+    const n = data.length;
+    let sx = 0, sy = 0, sxx = 0, sxy = 0;
+    for (const [x, y] of data) { sx += x; sy += y; sxx += x * x; sxy += x * y; }
+    const m = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+    const b = (sy - m * sx) / n;
+
+    ctx.strokeStyle = lineColor; ctx.lineWidth = 2; ctx.setLineDash([]);
+    const [x1c, y1c] = toCanvas(xRange[0], m * xRange[0] + b);
+    const [x2c, y2c] = toCanvas(xRange[1], m * xRange[1] + b);
+    ctx.beginPath(); ctx.moveTo(x1c, y1c); ctx.lineTo(x2c, y2c); ctx.stroke();
+
+    // Points
+    for (const [x, y] of data) {
+      const [cx, cy] = toCanvas(x, y);
+      ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+      ctx.fillStyle = dotColor.replace('OPACITY', dotOpacity);
+      ctx.fill();
+      ctx.strokeStyle = '#2D2D2D'; ctx.lineWidth = 0.4; ctx.stroke();
+    }
+  }
+
+  // Draw cross-sectional plot immediately
+  drawScatter('gdp-cross', crossData, [5.5, 10.5], [0, 45],
+    'log GDP per capita', 'Obesity prevalence (%)',
+    '#5E8C61', 'rgba(94, 140, 97, OPACITY)', '0.7');
+
+  // Draw empty detrended plot (just axes)
+  drawScatter('gdp-detrend', [], [-0.08, 0.08], [-0.4, 0.4],
+    'Detrended log GDP', 'Detrended obesity (%)',
+    '#4A6FA5', 'rgba(94, 140, 97, OPACITY)', '0.7');
+
+  window.runDetrend = function() {
+    if (animated) return;
+    animated = true;
+    const btn = document.getElementById('detrend-btn');
+    btn.classList.add('active');
+    btn.disabled = true;
+    btn.textContent = 'Detrended';
+
+    // Animate detrended stats appearing
+    document.getElementById('gdp-r-detrend').style.opacity = '1';
+    document.getElementById('gdp-t-detrend').style.opacity = '1';
+
+    // Animate dots appearing one by one on the detrended plot
+    let step = 0;
+    const interval = setInterval(() => {
+      step++;
+      const partial = detrendData.slice(0, step);
+      drawScatter('gdp-detrend', partial, [-0.08, 0.08], [-0.4, 0.4],
+        'Detrended log GDP', 'Detrended obesity (%)',
+        '#4A6FA5', 'rgba(94, 140, 97, OPACITY)', '0.7');
+      if (step >= detrendData.length) clearInterval(interval);
+    }, 40);
+  };
+})();
+
+
+// ====== CHAPTER 12: DIAGNOSTIC DASHBOARD ======
+(function() {
+  const rows = document.querySelectorAll('.diag-row');
+  const tally = document.getElementById('diag-tally');
+  let running = false;
+
+  window.runDiagnostics = function() {
+    if (running) return;
+    running = true;
+    const btn = document.getElementById('diag-run-btn');
+    btn.disabled = true;
+    btn.textContent = 'Running...';
+
+    rows.forEach((row, i) => {
+      setTimeout(() => {
+        row.classList.add('visible');
+
+        // Animate bar width
+        const bar = row.querySelector('.diag-bar');
+        const value = parseFloat(row.dataset.value);
+        const max = parseFloat(row.dataset.max);
+        const pct = Math.min((value / max) * 100, 100);
+        setTimeout(() => {
+          bar.style.width = pct + '%';
+        }, 50);
+
+        // Show tally after all rows
+        if (i === rows.length - 1) {
+          setTimeout(() => {
+            tally.classList.add('visible');
+            btn.textContent = 'Complete';
+          }, 600);
+        }
+      }, i * 350);
+    });
+  };
+})();
+</script>
+</body>
+</html>

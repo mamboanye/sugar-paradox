@@ -1,0 +1,29 @@
+\section{What Predicts Cross-Country Obesity Change}
+
+If food supply changes do not predict obesity change, what does? We regress the 2010--2020 change in women's obesity on corresponding changes in urbanization, sugar supply, vegetable oil supply, and GDP per capita, plus initial (2010) obesity prevalence. The regression uses one observation per country ($N = 37$).
+
+Table~\ref{tab:change} reports the results. The model explains 41\% of the variance in obesity change ($R^2 = 0.405$). Of the five predictors, only initial obesity is significant: $\hat{\beta} = 0.12$ ($t = 3.45$, $p = 0.002$). Countries with higher obesity in 2010 gained more obesity over the following decade. Sugar change contributes nothing ($t = -0.22$). GDP change contributes nothing ($t = 0.46$). Urbanization change is marginally positive ($t = 1.73$, $p = 0.09$). Vegetable oil change is marginally negative ($t = -1.84$, $p = 0.08$), though this marginal result does not survive more demanding specifications.
+
+\begin{table}[htbp]
+\centering
+\caption{Cross-country change regression, 2010--2020. Dependent variable: change in women's obesity prevalence (percentage points). $N = 37$ countries. $R^2 = 0.405$.}
+\label{tab:change}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Predictor & $\hat{\beta}$ & $t$ & $p$ \\
+\midrule
+$\Delta$ Urbanization & 0.154 & 1.73 & 0.094 \\
+$\Delta$ Sugar supply & $-0.002$ & $-0.22$ & 0.830 \\
+$\Delta$ Vegetable oils & $-0.008$ & $-1.84$ & 0.075 \\
+$\Delta$ GDP per capita & 0.770 & 0.46 & 0.652 \\
+Initial obesity (2010) & 0.120 & 3.45 & 0.002 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All 37 countries gained obesity over this period. The mean gain was 4.9 percentage points; the range was 1.4 to 9.4. The pattern is divergence, not convergence: countries with higher initial obesity gained more, not less. A country starting at 25\% obesity in 2010 gained roughly 1.8 percentage points more than a country starting at 10\%.
+
+This divergence explains why cross-sectional correlations between food supply and obesity grow stronger over time. High-sugar countries tend to be the same high-obesity countries, and these countries gain obesity faster than low-obesity countries. The gap widens year by year, strengthening the cross-sectional association at any point in time. But the widening is driven by initial conditions, not by sugar supply changes. Food supply variables add nothing to the prediction of obesity change once initial obesity is included.
+
+The divergence pattern is consistent with structural determinants: built environment, food retail infrastructure, sedentary employment share, and other features of economic development that correlate with initial obesity levels. These structural conditions are self-reinforcing. Countries further along the economic transition have environments that promote weight gain, and these environments accumulate rather than dissipate. The implication is that cross-country obesity differences reflect development trajectories, not the composition of national food supply.

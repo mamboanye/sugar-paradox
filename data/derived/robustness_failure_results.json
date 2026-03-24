@@ -1,0 +1,57 @@
+{
+  "cross_sectional": {
+    "r": 0.362,
+    "p": 0.0275,
+    "verdict": "significant"
+  },
+  "country_fe": {
+    "beta": 0.239,
+    "t_cl": 2.09,
+    "verdict": "significant"
+  },
+  "country_fe_nonclustered": {
+    "t": 4.65,
+    "se_inflation_ratio": 2.2
+  },
+  "twfe": {
+    "beta": 0.0383,
+    "t_cl": 0.7,
+    "verdict": "null"
+  },
+  "lead_lag": {
+    "beta_lead": 0.1825,
+    "beta_lag": 0.1843,
+    "ratio": 0.99,
+    "diagnosis": "co-trending"
+  },
+  "detrended": {
+    "t_cl": 1.62,
+    "verdict": "null"
+  },
+  "first_differences": {
+    "r": 0.035,
+    "p": 0.4621,
+    "verdict": "null"
+  },
+  "granger": {
+    "r": 0.053,
+    "p": 0.2826,
+    "verdict": "null"
+  },
+  "oster_bounds": {
+    "r2_bivariate": 0.1219,
+    "r2_fe": 0.9593,
+    "beta_bivariate": 0.5182,
+    "beta_fe": 0.239,
+    "coefficient_ratio": 0.461,
+    "delta": 17.6,
+    "interpretation": "High delta is misleading when both variables co-trend: the R2 jump comes from FE absorbing level differences, not from soy oil genuinely predicting within-country obesity."
+  },
+  "summary": {
+    "standard_tests_passed": 2,
+    "total_tests": 8,
+    "lead_lag_ratio": 0.99,
+    "diagnosis": "co-trending artifact",
+    "mechanism": "Soybean oil supply and obesity both trend upward within most SSA countries. Standard tests (cross-sectional, one-way FE, Oster bounds) cannot distinguish this co-trending from a causal relationship. Only tests that remove trends (TWFE, detrending, first differences) or check temporal ordering (lead-lag, Granger) detect the artifact."
+  }
+}

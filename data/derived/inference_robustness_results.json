@@ -1,0 +1,33 @@
+{
+  "bootstrap_one_way_fe": {
+    "beta": 0.034481,
+    "t_cluster": 0.254,
+    "p_cluster": 0.7995,
+    "boot_p": 0.8008,
+    "n_boot": 999
+  },
+  "bootstrap_twfe": {
+    "beta": -0.028665,
+    "t_cluster": -0.638,
+    "p_cluster": 0.5235,
+    "boot_p": 0.5806,
+    "n_boot": 999
+  },
+  "permutation": {
+    "observed_t": -0.638,
+    "perm_p": 0.5826,
+    "perm_mean_t": -0.035,
+    "perm_sd_t": 1.0711,
+    "pct_exceed_2": 5.4,
+    "n_perm": 999
+  },
+  "two_way_clustering": {
+    "beta": -0.028665,
+    "se_country": 0.044931,
+    "se_year": 0.0192,
+    "se_nonclustered": 0.017269,
+    "se_twoway": 0.045709,
+    "t_country": -0.64,
+    "t_twoway": -0.63
+  }
+}

@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ch 1-2: Vectors, Correlation, and Projection</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]})"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg: #FAFAF5;
+      --bg-alt: #F2F0E8;
+      --text: #2D2D2D;
+      --text-muted: #7A7A6E;
+      --amber: #C4843C;
+      --amber-light: #F5E6D3;
+      --slate: #4A6FA5;
+      --slate-light: #DDE5F0;
+      --sage: #5E8C61;
+      --sage-light: #E0EDDF;
+      --border: #E0DED6;
+      --code-bg: #1E1E2E;
+      --code-text: #CDD6F4;
+      --font-body: 'Crimson Pro', Georgia, serif;
+      --font-code: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1.12rem;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 2rem 4rem;
+    }
+
+    header {
+      padding: 3rem 0 2rem;
+      border-bottom: 2px solid var(--amber);
+      margin-bottom: 3rem;
+    }
+    header h1 {
+      font-weight: 300;
+      font-size: 2.4rem;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    header .subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    .chapter {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    h2 {
+      font-weight: 600;
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+    h2 .ch-num { color: var(--amber); font-weight: 300; }
+    h3 { font-weight: 600; font-size: 1.1rem; margin: 2rem 0 0.6rem; }
+    p { margin: 0.7rem 0; max-width: 680px; }
+
+    .concept-box {
+      background: var(--amber-light);
+      padding: 1.1rem 1.4rem;
+      margin: 1.5rem 0;
+      border-radius: 3px;
+      font-size: 0.93rem;
+      line-height: 1.6;
+      max-width: 720px;
+    }
+    .concept-box .label {
+      font-weight: 600; color: var(--amber);
+      text-transform: uppercase; font-size: 0.72rem;
+      letter-spacing: 0.08em; display: block; margin-bottom: 0.2rem;
+    }
+    .concept-box.slate-box { background: var(--slate-light); }
+    .concept-box.slate-box .label { color: var(--slate); }
+    .concept-box.sage-box { background: var(--sage-light); }
+    .concept-box.sage-box .label { color: var(--sage); }
+
+    /* ====== INTERACTIVE WIDGETS ====== */
+    .widget {
+      background: var(--bg-alt);
+      border-radius: 8px;
+      padding: 1.5rem 2rem 1rem;
+      margin: 2rem 0;
+    }
+    .widget h3 { margin-top: 0; font-size: 0.95rem; color: var(--text-muted); font-weight: 400; }
+    canvas { display: block; margin: 0.5rem auto; cursor: crosshair; }
+
+    .stat-row {
+      display: flex; gap: 1rem; align-items: center; justify-content: center;
+      margin-top: 0.8rem; font-size: 0.82rem; font-family: var(--font-code);
+      flex-wrap: wrap;
+    }
+    .stat-row .stat { padding: 0.3rem 0.8rem; border-radius: 3px; }
+    .stat-row .stat.amber-bg { background: var(--amber-light); color: var(--amber); }
+    .stat-row .stat.slate-bg { background: var(--slate-light); color: var(--slate); }
+    .stat-row .stat.sage-bg { background: var(--sage-light); color: var(--sage); }
+
+    .reset-btn {
+      font-family: var(--font-code); font-size: 0.72rem;
+      padding: 0.3rem 0.7rem; border: 1px solid var(--border);
+      border-radius: 3px; background: white; cursor: pointer;
+      transition: all 0.2s; display: inline-block; margin-top: 0.5rem;
+    }
+    .reset-btn:hover { border-color: var(--amber); color: var(--amber); }
+
+    /* ====== CODE ====== */
+    .code-block { margin: 1.5rem 0; border-radius: 6px; overflow: hidden; max-width: 740px; }
+    .code-block.amber { border-left: 3px solid var(--amber); }
+    .code-block.slate { border-left: 3px solid var(--slate); }
+    .code-block pre {
+      background: var(--code-bg); color: var(--code-text);
+      font-family: var(--font-code); font-size: 0.78rem;
+      line-height: 1.6; padding: 1.2rem 1.4rem; overflow-x: auto; margin: 0;
+    }
+    .code-block .output {
+      background: #F5F4EE; padding: 0.7rem 1.4rem;
+      font-family: var(--font-code); font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+    .result-num { font-weight: 500; color: var(--amber); }
+
+    .paper-conn {
+      background: var(--bg-alt); padding: 1rem 1.3rem; border-radius: 3px;
+      margin: 1.5rem 0; font-size: 0.93rem; max-width: 720px;
+    }
+    .paper-conn .tag {
+      font-family: var(--font-code); font-size: 0.68rem; color: var(--slate);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.2rem; display: block;
+    }
+
+    /* ====== QUIZ ====== */
+    .quiz-section { margin: 2rem 0; }
+    .quiz-q { padding: 0.8rem 0; border-bottom: 1px solid var(--border); max-width: 680px; }
+    .quiz-q .question {
+      font-weight: 600; font-size: 0.93rem; cursor: pointer; color: var(--sage);
+      display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+    .quiz-q .question::before {
+      content: '\25B6'; font-size: 0.6rem; margin-top: 0.35rem;
+      transition: transform 0.2s; display: inline-block; flex-shrink: 0;
+    }
+    .quiz-q.open .question::before { transform: rotate(90deg); }
+    .quiz-q .answer {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s;
+      font-size: 0.9rem; color: var(--text-muted); padding-left: 1.1rem;
+    }
+    .quiz-q.open .answer { max-height: 500px; padding-top: 0.5rem; }
+
+    /* ====== DEEP DIVE ====== */
+    details.deep-dive {
+      margin: 1.5rem 0; border-left: 2px solid var(--border); padding-left: 1.2rem; max-width: 680px;
+    }
+    details.deep-dive summary { cursor: pointer; font-style: italic; color: var(--text-muted); font-size: 0.93rem; }
+    details.deep-dive[open] summary { margin-bottom: 0.6rem; }
+
+    .bridge {
+      font-style: italic; color: var(--text-muted); margin: 2.5rem 0 0;
+      font-size: 0.93rem; max-width: 680px;
+    }
+
+    /* ====== STAT 538 TAG ====== */
+    .stat538-tag {
+      display: inline-block; font-family: var(--font-code);
+      font-size: 0.68rem; padding: 0.15rem 0.5rem;
+      border: 1px solid var(--border); border-radius: 3px;
+      color: var(--text-muted); margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+
+    /* ====== PROJECTION WIDGET ====== */
+    .proj-controls {
+      display: flex; gap: 0.5rem; margin-top: 0.8rem; justify-content: center;
+      flex-wrap: wrap;
+    }
+    .proj-btn {
+      font-family: var(--font-code); font-size: 0.72rem;
+      padding: 0.3rem 0.8rem; border: 1px solid var(--border);
+      border-radius: 3px; background: white; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .proj-btn:hover { border-color: var(--amber); color: var(--amber); }
+    .proj-btn.active { background: var(--amber); color: white; border-color: var(--amber); }
+
+    /* math display overrides */
+    .katex-display { margin: 1rem 0 !important; }
+
+    @media (max-width: 760px) {
+      .page { padding: 1rem; }
+      canvas { width: 100% !important; height: auto !important; }
+      header h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Learning Regression Through the Sugar Paradox</h1>
+    <p class="subtitle">Chapters 1-2: Vectors, Correlation, and Projection</p>
+  </header>
+
+  <!-- ================================================================= -->
+  <!-- CHAPTER 1: Vectors and Correlation                                -->
+  <!-- ================================================================= -->
+  <section class="chapter" id="ch1">
+    <h2><span class="ch-num">1</span> Vectors and Correlation <span class="stat538-tag">STAT 538 M1</span></h2>
+
+    <div class="concept-box">
+      <span class="label">Core idea</span>
+      Each column of data is a vector. The correlation between two variables is the cosine
+      of the angle between their centered vectors. When we say \(r = 0.677\), we are saying
+      the angle between the centered sugar and obesity vectors is about 47 degrees.
+    </div>
+
+    <h3>Data as vectors</h3>
+    <p>We have 37 Sub-Saharan African countries. For each country, we measure two things:
+    sugar supply (kcal per capita per day) and women's obesity prevalence (%). Average both
+    over 2018-2020 to get a single snapshot per country.</p>
+
+    <p>Now think of these measurements as vectors in 37-dimensional space. The sugar vector
+    \(\mathbf{x} = (x_1, x_2, \ldots, x_{37})\) has one entry per country. The obesity vector
+    \(\mathbf{y} = (y_1, y_2, \ldots, y_{37})\) does the same. Each vector is a point in
+    \(\mathbb{R}^{37}\).</p>
+
+    <h3>Centering</h3>
+    <p>Before computing correlation, we center both vectors by subtracting their means:</p>
+
+    $$\tilde{\mathbf{x}} = \mathbf{x} - \bar{x}\mathbf{1}, \qquad \tilde{\mathbf{y}} = \mathbf{y} - \bar{y}\mathbf{1}$$
+
+    <p>Centering moves the origin to the mean of the data, so the vectors now represent
+    deviations from the average. This is what makes correlation a measure of <em>linear
+    association</em> rather than agreement in raw levels.</p>
+
+    <h3>Correlation is cosine</h3>
+    <p>The Pearson correlation coefficient is defined as:</p>
+
+    $$r = \frac{\tilde{\mathbf{x}} \cdot \tilde{\mathbf{y}}}{\|\tilde{\mathbf{x}}\| \; \|\tilde{\mathbf{y}}\|} = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2} \; \sqrt{\sum_{i=1}^{n}(y_i - \bar{y})^2}} = \cos(\theta)$$
+
+    <p>This is exactly the formula for the cosine of the angle between two vectors. When
+    \(r = 1\), the centered vectors point in the same direction (\(\theta = 0^\circ\)).
+    When \(r = 0\), they are perpendicular (\(\theta = 90^\circ\)). When \(r = -1\), they
+    point in opposite directions (\(\theta = 180^\circ\)).</p>
+
+    <div class="concept-box">
+      <span class="label">The paper number</span>
+      For our 37 countries, \(r = 0.677\). That means the angle between centered sugar
+      and centered obesity is \(\theta = \arccos(0.677) \approx 47.4^\circ\). The vectors
+      are pointing in roughly the same direction, but they are far from aligned.
+    </div>
+
+    <h3>See it: drag the countries</h3>
+    <p>Each dot below is one of the 37 countries. The horizontal axis is sugar supply, the
+    vertical axis is obesity prevalence. <strong>Drag any dot</strong> to see how the
+    correlation and angle respond. Notice that moving a dot far from the cluster center
+    (a high-leverage point) changes \(r\) more than moving a central dot.</p>
+    <p style="font-size:0.88rem; color:var(--text-muted);">Double-click to reset all points to their real values.</p>
+
+    <div class="widget">
+      <h3>37 SSA countries, 2018-2020 averages (drag a dot)</h3>
+      <canvas id="scatter1" width="700" height="400"></canvas>
+      <div class="stat-row">
+        <span class="stat amber-bg" id="s1-r">r = 0.677</span>
+        <span class="stat amber-bg" id="s1-angle">angle = 47.4deg</span>
+        <span class="stat" style="color:var(--text-muted)">N = 37</span>
+      </div>
+      <div style="text-align:center">
+        <button class="reset-btn" id="s1-reset">Reset to real data</button>
+      </div>
+    </div>
+
+    <h3>Computing it step by step</h3>
+    <div class="code-block amber">
+<pre><span style="color:#89B4FA">import</span> numpy <span style="color:#89B4FA">as</span> np
+<span style="color:#89B4FA">from</span> scipy <span style="color:#89B4FA">import</span> stats
+
+<span style="color:#6C7086"># 37 countries: sugar supply and obesity prevalence (2018-2020 means)</span>
+sugar = np.array([129.8, 66.1, 266.0, 104.5, 107.8, 31.4, 114.9,
+                  170.7, 175.0, 77.8, 172.7, 125.7, 141.6, 514.3,
+                  51.1, 201.9, 68.4, 128.7, 84.5, 112.9, 386.8,
+                  341.3, 68.5, 268.2, 54.6, 95.0, 97.7, 165.6,
+                  75.6, 163.9, 343.2, 299.4, 112.6, 129.5, 315.9,
+                  122.2, 177.6])
+
+obesity = np.array([15.51, 7.99, 26.66, 14.65, 19.66, 8.18, 12.82,
+                    22.78, 21.36, 3.88, 30.09, 19.60, 11.36, 18.33,
+                    13.77, 17.18, 19.03, 31.65, 3.65, 12.41, 32.88,
+                    24.76, 10.52, 22.73, 7.06, 15.38, 6.55, 14.93,
+                    10.98, 21.96, 42.86, 39.29, 16.54, 9.99, 45.62,
+                    14.88, 19.99])
+
+<span style="color:#6C7086"># Step 1: Center both vectors</span>
+x_centered = sugar - sugar.mean()
+y_centered = obesity - obesity.mean()
+
+<span style="color:#6C7086"># Step 2: Dot product of centered vectors</span>
+dot = np.dot(x_centered, y_centered)
+
+<span style="color:#6C7086"># Step 3: Divide by product of lengths</span>
+r = dot / (np.linalg.norm(x_centered) * np.linalg.norm(y_centered))
+
+<span style="color:#6C7086"># Step 4: Verify with scipy</span>
+r_scipy, p_scipy = stats.pearsonr(sugar, obesity)
+
+<span style="color:#6C7086"># Step 5: Compute the angle</span>
+angle_deg = np.degrees(np.arccos(r))
+
+print(f<span style="color:#A6E3A1">"Manual r  = {r:.3f}"</span>)
+print(f<span style="color:#A6E3A1">"Scipy r   = {r_scipy:.3f}  (p = {p_scipy:.6f})"</span>)
+print(f<span style="color:#A6E3A1">"Angle     = {angle_deg:.1f} degrees"</span>)</pre>
+      <div class="output">Manual r  = <span class="result-num">0.677</span><br>Scipy r   = <span class="result-num">0.677</span>  (p = 0.000004)<br>Angle     = <span class="result-num">47.4</span> degrees</div>
+    </div>
+    <!-- Verified: r=0.677, p<0.001, angle=47.4 from 02_cross_sectional.py output and scipy computation -->
+
+    <div class="paper-conn">
+      <span class="tag">Paper connection</span>
+      Figure 1A: bivariate \(r = 0.68\), \(p < 0.001\). The paper rounds to two decimals. Our
+      computed value of \(r = 0.677\) rounds to 0.68. This is the number that makes sugar
+      look like it drives obesity -- countries with more sugar supply have more obesity. Every
+      chapter from here forward will interrogate this number.
+    </div>
+
+    <h3>Why cosine?</h3>
+    <p>The dot product formula \(\mathbf{a} \cdot \mathbf{b} = \|\mathbf{a}\| \|\mathbf{b}\| \cos\theta\)
+    is a fact of linear algebra that holds in any number of dimensions. When you divide the
+    dot product by the two vector lengths, you isolate the angle -- the direction of
+    association stripped of scale. That is exactly what correlation does: it removes scale
+    (via centering and normalizing by the standard deviations) and measures only the
+    directional alignment between two variables.</p>
+
+    <p>The connection is not just an analogy. It is literally the same operation. The Pearson
+    \(r\) <em>is</em> the cosine of the angle between centered data vectors. This geometric
+    fact will matter in Chapter 2, where regression becomes projection and \(R^2\) becomes
+    \(\cos^2\) of a different angle.</p>
+
+    <!-- QUIZ -->
+    <div class="quiz-section">
+      <h3>Check your understanding</h3>
+
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">In simple linear regression, the explanatory variable x differs from the response y in what way?</div>
+        <div class="answer">The value of \(x\) can sometimes be chosen by the person designing the study or experiment. In our data, nobody chose sugar supply levels -- they are observational -- but the asymmetry remains: we are asking whether sugar (x) predicts obesity (y), not the reverse. <em>(Adapted from STAT 538 M1 Reading Quiz Q1.)</em></div>
+      </div>
+
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">If the angle between centered sugar and centered obesity were 90 degrees, what would r be? What would that mean?</div>
+        <div class="answer">\(\cos(90^\circ) = 0\), so \(r = 0\). The two variables would be linearly uncorrelated -- knowing a country's sugar supply would tell you nothing (linearly) about its obesity prevalence. As we will see in later chapters, this is roughly what happens <em>within</em> countries once we remove between-country differences.</div>
+      </div>
+
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">With 37 countries, the vectors live in \(\mathbb{R}^{37}\). Why can't we visualize this space directly?</div>
+        <div class="answer">We can draw 2D or 3D spaces, but 37-dimensional space is beyond visual intuition. The scatter plot above is a <em>different</em> representation: each axis is a variable (sugar, obesity), and each dot is an observation (country). The vector geometry operates in observation space (\(\mathbb{R}^{37}\)), while the scatter plot operates in variable space (\(\mathbb{R}^2\)). The correlation is the same number either way.</div>
+      </div>
+
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">Why do we center the vectors before computing r? What would happen if we didn't?</div>
+        <div class="answer">Without centering, the dot product would conflate the shared location of the data (both variables have positive means) with the actual direction of association. Two variables could have a high uncentered cosine simply because they are both far from the origin. Centering removes the overall level, so the angle reflects only how the <em>deviations</em> co-vary. Formally, centering projects both vectors onto the subspace orthogonal to the constant vector \(\mathbf{1}\).</div>
+      </div>
+
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">In the widget above, dragging South Africa (the upper-right dot at 316 sugar, 46% obesity) changes r much more than dragging Ethiopia (78 sugar, 4% obesity). Why?</div>
+        <div class="answer">South Africa is far from the centroid on both variables, so it has high <em>leverage</em>. In the vector dot product, the terms \((x_i - \bar{x})(y_i - \bar{y})\) for South Africa are large because both deviations are large. Moving a high-leverage point changes the dot product substantially. Ethiopia is closer to the mean on sugar, so its leverage is lower. We will formalize leverage in a later chapter.</div>
+      </div>
+    </div>
+
+    <!-- DEEP DIVE -->
+    <details class="deep-dive">
+      <summary>Deep dive: Why the normal equations are called "normal"</summary>
+      <p>When you hear "normal equations" in regression, the word "normal" refers to geometry, not the
+      normal distribution. In the context of least squares, the residual vector is
+      <em>normal</em> (perpendicular) to the column space of X. The equations that enforce this
+      perpendicularity are the normal equations:</p>
+      <p>$$\mathbf{X}^T(\mathbf{y} - \mathbf{X}\hat{\boldsymbol\beta}) = \mathbf{0}$$</p>
+      <p>This says the residuals \(\mathbf{y} - \mathbf{X}\hat{\boldsymbol\beta}\) are orthogonal to
+      every column of \(\mathbf{X}\). We will see in Chapter 2 that this orthogonality condition
+      is exactly what makes regression a perpendicular projection.</p>
+    </details>
+
+    <details class="deep-dive">
+      <summary>Deep dive: SXX, SXY, and why least squares formulas look the way they do</summary>
+      <p>STAT 538 writes the least squares slope as \(\hat{\beta}_1 = SXY / SXX\), where:</p>
+      <p>$$SXY = \sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y}), \qquad SXX = \sum_{i=1}^{n}(x_i - \bar{x})^2$$</p>
+      <p>Now look at the correlation formula: \(r = SXY / \sqrt{SXX \cdot SYY}\). The slope and correlation
+      are related by \(\hat{\beta}_1 = r \cdot (s_y / s_x)\), where \(s_y\) and \(s_x\) are the
+      standard deviations. The slope rescales the correlation to account for the different units of y and x. For our data:</p>
+      <p>$$\hat{\beta}_1 = 0.677 \times \frac{10.04}{106.47} = 0.0639 \text{ percentage points per kcal/day}$$</p>
+      <p>which is exactly the slope of the regression line in the scatter plot above.</p>
+    </details>
+
+    <p class="bridge">We have a strong correlation: \(r = 0.677\). Countries with more sugar have more obesity.
+    But correlation only measures the angle between two vectors. In Chapter 2, we fit a line
+    through this cloud -- and that line turns out to be a <em>projection</em>.</p>
+  </section>
+
+  <!-- ================================================================= -->
+  <!-- CHAPTER 2: Simple Regression as Projection                        -->
+  <!-- ================================================================= -->
+  <section class="chapter" id="ch2">
+    <h2><span class="ch-num">2</span> Simple Regression as Projection <span class="stat538-tag">STAT 538 M1</span></h2>
+
+    <div class="concept-box">
+      <span class="label">Core idea</span>
+      Regression projects the response vector \(\mathbf{y}\) onto the column space of
+      \(\mathbf{X}\). The fitted values \(\hat{\mathbf{y}}\) are the shadow. The residuals
+      \(\hat{\mathbf{e}}\) are the perpendicular gap. \(R^2 = \cos^2(\theta)\) where
+      \(\theta\) is the angle between \(\tilde{\mathbf{y}}\) and \(\hat{\mathbf{y}}\).
+    </div>
+
+    <h3>From correlation to regression</h3>
+    <p>In Chapter 1 we measured the angle between two vectors. Now we do something different:
+    we find the <em>closest point</em> in one subspace to a vector outside it. That closest
+    point is the projection, and finding it is exactly what ordinary least squares does.</p>
+
+    <p>The SLR model says:</p>
+    $$E(Y | X = x) = \beta_0 + \beta_1 x$$
+
+    <p>In matrix form, we collect the 481 observations (37 countries times 13 years, women's
+    panel) into a response vector \(\mathbf{y}\) and a design matrix \(\mathbf{X}\) with
+    columns for the intercept, sugar supply, and vegetable oil supply. Then we seek
+    \(\hat{\boldsymbol\beta}\) that minimizes:</p>
+
+    $$RSS = \|\mathbf{y} - \mathbf{X}\hat{\boldsymbol\beta}\|^2 = \sum_{i=1}^{n}(y_i - \hat{y}_i)^2$$
+
+    <h3>The geometry: perpendicular projection</h3>
+    <p>The columns of \(\mathbf{X}\) span a subspace (the "column space"). Every possible
+    fitted value vector \(\mathbf{X}\boldsymbol\beta\) lives in this subspace. OLS finds the
+    \(\hat{\boldsymbol\beta}\) that makes \(\hat{\mathbf{y}} = \mathbf{X}\hat{\boldsymbol\beta}\)
+    as close to \(\mathbf{y}\) as possible. "As close as possible" means perpendicular drop.</p>
+
+    <p>The residual vector \(\hat{\mathbf{e}} = \mathbf{y} - \hat{\mathbf{y}}\) is orthogonal
+    to every column of \(\mathbf{X}\). This is not an assumption -- it is a mathematical
+    consequence of minimizing RSS. The normal equations enforce it:</p>
+
+    $$\mathbf{X}^T \hat{\mathbf{e}} = \mathbf{0} \qquad \Longleftrightarrow \qquad \hat{\mathbf{e}} \perp \text{col}(\mathbf{X})$$
+
+    <div class="concept-box">
+      <span class="label">Pythagorean theorem in high dimensions</span>
+      Because \(\hat{\mathbf{y}}\) and \(\hat{\mathbf{e}}\) are orthogonal, we get
+      $$\|\tilde{\mathbf{y}}\|^2 = \|\hat{\mathbf{y}} - \bar{y}\mathbf{1}\|^2 + \|\hat{\mathbf{e}}\|^2$$
+      which is the sums-of-squares decomposition \(SST = SSReg + RSS\). This is literally the
+      Pythagorean theorem applied in \(\mathbb{R}^{481}\).
+    </div>
+
+    <h3>R-squared is cosine squared</h3>
+    <p>Divide both sides of the Pythagorean relation by \(SST\):</p>
+
+    $$1 = \frac{SSReg}{SST} + \frac{RSS}{SST} = R^2 + (1 - R^2)$$
+
+    <p>Now recall that the cosine of the angle \(\theta\) between \(\tilde{\mathbf{y}}\) (centered
+    response) and \(\hat{\mathbf{y}} - \bar{y}\mathbf{1}\) (centered fitted values) satisfies:</p>
+
+    $$\cos^2(\theta) = \frac{\|\hat{\mathbf{y}} - \bar{y}\mathbf{1}\|^2}{\|\tilde{\mathbf{y}}\|^2} = \frac{SSReg}{SST} = R^2$$
+
+    <p>So \(R^2\) is the squared cosine of the angle between the centered response and its
+    projection onto the model subspace. When \(R^2 = 0.49\), the angle is
+    \(\arccos(\sqrt{0.49}) = \arccos(0.7) \approx 45.6^\circ\).</p>
+
+    <h3>See it: drag Y and watch the projection</h3>
+    <p>The widget below works in a simplified 2D picture. The amber line is the column space
+    of X (the regression line direction). The blue vector is Y. <strong>Drag the tip of Y</strong>
+    to watch \(\hat{Y}\) (the projection, shown as a dot on the line) and the residual
+    (the perpendicular dashed line) update live. The angle between Y and \(\hat{Y}\) determines
+    \(R^2\).</p>
+
+    <div class="widget">
+      <h3>Projection of Y onto the column space of X</h3>
+      <canvas id="proj-canvas" width="700" height="440"></canvas>
+      <div class="stat-row">
+        <span class="stat amber-bg" id="proj-r2">R&sup2; = 0.49</span>
+        <span class="stat amber-bg" id="proj-angle">angle = 45.6deg</span>
+        <span class="stat slate-bg" id="proj-resid">||residual|| = 71%</span>
+      </div>
+      <div class="proj-controls">
+        <button class="proj-btn active" id="proj-mode-free" onclick="setProjMode('free')">Free drag</button>
+        <button class="proj-btn" id="proj-mode-paper" onclick="setProjMode('paper')">Paper value (R&sup2;=0.49)</button>
+        <button class="proj-btn" id="proj-mode-perfect" onclick="setProjMode('perfect')">Perfect fit (R&sup2;=1)</button>
+        <button class="proj-btn" id="proj-mode-null" onclick="setProjMode('null')">Null (R&sup2;=0)</button>
+      </div>
+    </div>
+
+    <h3>The pooled OLS: sugar looks enormous</h3>
+    <p>When we project the obesity vector onto the column space spanned by an intercept, sugar
+    supply, and vegetable oil supply using all 481 observations in the women's panel, we get the
+    pooled OLS estimate. There are no country indicators, no year effects -- just one big
+    regression mixing all between-country and within-country variation together.</p>
+
+    <div class="code-block amber">
+<pre><span style="color:#89B4FA">import</span> pandas <span style="color:#89B4FA">as</span> pd
+<span style="color:#89B4FA">import</span> numpy <span style="color:#89B4FA">as</span> np
+<span style="color:#89B4FA">import</span> statsmodels.formula.api <span style="color:#89B4FA">as</span> smf
+
+panel = pd.read_csv(<span style="color:#A6E3A1">"data/derived/analysis_panel.csv"</span>)
+women = panel[panel[<span style="color:#A6E3A1">"sex"</span>] == <span style="color:#A6E3A1">"Women"</span>].copy()
+
+<span style="color:#6C7086"># Scale sugar to 10-kcal units, oil to 100-kcal units (matching Table 1)</span>
+women[<span style="color:#A6E3A1">"sugar_10kcal"</span>] = women[<span style="color:#A6E3A1">"primary_exposure_food_supply_kcal_capita_day"</span>] / 10
+women[<span style="color:#A6E3A1">"oil_100kcal"</span>] = women[<span style="color:#A6E3A1">"vegetable_oils_comparison_food_supply_kcal_capita_day"</span>] / 100
+
+<span style="color:#6C7086"># Pooled OLS (Table 1, row 1)</span>
+fit = smf.ols(<span style="color:#A6E3A1">"obesity_prevalence_pct ~ sugar_10kcal + oil_100kcal"</span>, data=women).fit()
+
+print(f<span style="color:#A6E3A1">"beta_sugar = {fit.params['sugar_10kcal']:.3f}"</span>)
+print(f<span style="color:#A6E3A1">"t_sugar    = {fit.tvalues['sugar_10kcal']:.2f}"</span>)
+print(f<span style="color:#A6E3A1">"R-squared  = {fit.rsquared:.4f}"</span>)
+print(f<span style="color:#A6E3A1">"N          = {len(women)}"</span>)
+
+<span style="color:#6C7086"># Verify residuals are orthogonal to sugar</span>
+resid = fit.resid.values
+sugar_col = women[<span style="color:#A6E3A1">"sugar_10kcal"</span>].values
+print(f<span style="color:#A6E3A1">"\ndot(resid, sugar) = {np.dot(resid, sugar_col):.10f}"</span>)
+
+<span style="color:#6C7086"># Verify R-squared = 1 - ||resid||^2 / ||centered_y||^2</span>
+y = women[<span style="color:#A6E3A1">"obesity_prevalence_pct"</span>].values
+y_centered = y - y.mean()
+r2_manual = 1 - np.dot(resid, resid) / np.dot(y_centered, y_centered)
+print(f<span style="color:#A6E3A1">"R-squared (manual) = {r2_manual:.4f}"</span>)</pre>
+      <div class="output">beta_sugar = <span class="result-num">0.630</span><br>t_sugar    = <span class="result-num">19.84</span><br>R-squared  = <span class="result-num">0.4878</span><br>N          = 481<br><br>dot(resid, sugar) = 0.0000000000<br>R-squared (manual) = 0.4878</div>
+    </div>
+    <!-- Verified: beta=0.630, t=19.84, R2=0.4878 matches Table 1 row 1 exactly -->
+
+    <p>Two things to notice. First, the dot product of the residuals with sugar is exactly zero.
+    This is not a coincidence -- it is the normal equations in action. The residual vector is
+    orthogonal to the column space. Second, the manual \(R^2\) computation
+    (\(1 - \|\hat{\mathbf{e}}\|^2 / \|\tilde{\mathbf{y}}\|^2\)) matches the model output
+    exactly. Pythagorean theorem, verified numerically.</p>
+
+    <h3>What do these numbers mean?</h3>
+    <p>The coefficient \(\hat{\beta}_{sugar} = 0.630\) says: holding vegetable oil supply
+    constant, each additional 10 kcal/day of sugar supply is associated with 0.63 percentage
+    points higher obesity prevalence. That is the slope of the regression hyperplane in the
+    sugar direction.</p>
+
+    <p>The t-statistic \(t = 19.84\) tests whether this slope is zero:</p>
+
+    $$t = \frac{\hat{\beta}_1 - 0}{se(\hat{\beta}_1)} = \frac{0.630}{0.032} = 19.84$$
+
+    <p>Under the null hypothesis \(H_0: \beta_1 = 0\), this t-statistic follows a
+    \(t_{n-p}\) distribution with \(n - p = 481 - 3 = 478\) degrees of freedom. The
+    p-value is vanishingly small. By every conventional standard, the sugar coefficient is
+    overwhelmingly significant.</p>
+
+    <div class="concept-box">
+      <span class="label">The paper number</span>
+      Table 1, row 1: Pooled OLS, \(\hat{\beta} = 0.630\), \(t = 19.84\), \(R^2 = 0.49\).
+      This projection explains about half the variance. Sugar looks huge and overwhelming.
+      But this regression mixes between-country variation (rich urbanized countries have more
+      sugar and more obesity) with within-country variation (did obesity rise when sugar rose
+      within the same country?). Every chapter from here forward will decompose and erode this number.
+    </div>
+
+    <div class="paper-conn">
+      <span class="tag">Paper connection</span>
+      "Pooled OLS, which mixes between-country and within-country variation, yields a strong sugar
+      coefficient (\(t = 19.84\))." The paper proceeds to show that adding country fixed effects
+      drops this to \(t = 0.25\). The projection onto a richer subspace (one that includes
+      country indicators) yields a completely different answer. That is Chapter 5 of this
+      textbook. For now, absorb the geometry: the number 0.630 is the length of a shadow,
+      and the shadow will shrink when the screen changes.
+    </div>
+
+    <!-- QUIZ -->
+    <div class="quiz-section">
+      <h3>Check your understanding</h3>
+
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">What hypothesis does the t-statistic \(t = 19.84\) test?</div>
+        <div class="answer">It tests \(H_0: \beta_{sugar} = 0\) vs. \(H_A: \beta_{sugar} \neq 0\). In words: "Does the mean of obesity change as a function of sugar supply, holding oil constant?" The answer here is an emphatic yes -- but only because pooled OLS mixes two kinds of variation. <em>(Adapted from STAT 538 M1 Reading Quiz Q7 and Problem Solving Quiz Q2.)</em></div>
+      </div>
+
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">We verified that \(\text{dot}(\hat{\mathbf{e}}, \mathbf{x}_{sugar}) = 0\). Why is this guaranteed?</div>
+        <div class="answer">The normal equations \(\mathbf{X}^T\hat{\mathbf{e}} = \mathbf{0}\) say that the residual is orthogonal to <em>every</em> column of \(\mathbf{X}\). Sugar is one of those columns, so the dot product is zero by construction. This is the defining property of a perpendicular projection: the "error" (distance from the subspace) points straight away from the subspace, not along it.</div>
+      </div>
+
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">The residual standard error estimates which quantity?</div>
+        <div class="answer">It estimates \(\sigma\), the standard deviation of the error term \(e\). Specifically, \(s = \sqrt{RSS / (n - p)}\), where \(n - p\) are the degrees of freedom. The formula \(Var(e) = \sigma^2\) gives the variance; the residual SE is its square root. <em>(Adapted from STAT 538 M1 Reading Quiz Q6.)</em></div>
+      </div>
+
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">If \(R^2 = \cos^2(\theta)\) and our \(R^2 = 0.49\), what is the angle \(\theta\) between centered Y and its projection?</div>
+        <div class="answer">\(\theta = \arccos(\sqrt{0.49}) = \arccos(0.7) \approx 45.6^\circ\). The centered response and the centered fitted values make a 46-degree angle. The projection captures about half the "length" (variance) of Y. The residual carries the other half.</div>
+      </div>
+
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">Why is the prediction interval for a new observation much wider than the confidence interval for the mean response?</div>
+        <div class="answer">The CI for \(E(Y|X=x^*)\) only accounts for uncertainty in the <em>position of the regression plane</em>. The prediction interval for a new \(Y_{new}\) must also account for the individual error \(e\), which adds an extra \(\sigma^2\) term. The formula is \(se(Y^*_{new} - \hat{y}^*) = s\sqrt{1 + 1/n + (x^* - \bar{x})^2/SXX}\) -- the "1 +" makes it much larger. <em>(Adapted from STAT 538 M1 Reading Quiz Q9.)</em></div>
+      </div>
+
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">In the projection widget above, what happens to \(R^2\) when you drag Y perpendicular to the X-line?</div>
+        <div class="answer">\(R^2 \to 0\). When Y is orthogonal to the column space, the projection \(\hat{Y}\) is zero (after centering). All of Y's length becomes residual. The model explains nothing. This is the geometric version of "no linear relationship."</div>
+      </div>
+    </div>
+
+    <!-- DEEP DIVE -->
+    <details class="deep-dive">
+      <summary>Deep dive: The F-statistic and its relationship to t</summary>
+      <p>The overall model F-statistic tests whether the model is better than intercept-only:</p>
+      <p>$$F = \frac{SSReg / p^*}{RSS / (n - p)} \sim F_{p^*, n-p}$$</p>
+      <p>where \(p^* = p - 1\) is the number of predictors (excluding intercept). In simple
+      linear regression with one predictor, \(F = t^2\). With our pooled OLS, the sugar
+      t-statistic is 19.84, and if we had a simple regression with sugar only, the
+      F-statistic would be \(19.84^2 = 393.6\). The F-test asks "is the model better than
+      no model?" while the t-test asks "is this particular slope nonzero?" In SLR they are
+      the same question.</p>
+      <p>The ANOVA table decomposes this: \(SST = SSReg + RSS\). Each sum of squares is a
+      squared vector length. The F-statistic is the ratio of per-dimension fit improvement to
+      per-dimension residual. Geometrically, it asks: does projecting onto this extra
+      dimension reduce the residual length enough to be worth the extra dimension?</p>
+    </details>
+
+    <details class="deep-dive">
+      <summary>Deep dive: Why the hat matrix matters</summary>
+      <p>The projection is performed by the hat matrix:</p>
+      <p>$$\mathbf{H} = \mathbf{X}(\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T$$</p>
+      <p>So \(\hat{\mathbf{y}} = \mathbf{H}\mathbf{y}\). The diagonal entries \(h_{ii}\) are
+      the leverages -- they measure how much influence observation \(i\) has on its own fitted
+      value. If \(h_{ii} \approx 1\), that observation essentially determines its own fit. If
+      \(h_{ii}\) is small, the fitted value is an average over many observations.</p>
+      <p>For our pooled OLS with 481 observations and 3 parameters, the average leverage is
+      \(p/n = 3/481 = 0.006\). Countries like South Africa (high sugar, high obesity) or
+      The Gambia (very high sugar, moderate obesity) have higher leverage because they sit far
+      from the centroid of X.</p>
+      <p>The residual variance is <em>not</em> constant across observations:
+      \(Var(\hat{e}_i) = \sigma^2(1 - h_{ii})\). High-leverage points have <em>smaller</em>
+      residual variance because the regression line is pulled toward them. This is why
+      standardized residuals \(r_i = \hat{e}_i / (s\sqrt{1 - h_{ii}})\) divide by the
+      leverage-adjusted standard deviation.</p>
+    </details>
+
+    <details class="deep-dive">
+      <summary>Deep dive: Connecting R-squared in Chapters 1 and 2</summary>
+      <p>In Chapter 1 we computed \(r = 0.677\) (bivariate correlation between sugar and
+      obesity, 37 country means). In Chapter 2 we computed \(R^2 = 0.488\) (pooled OLS with
+      sugar + oil, 481 panel observations). These are related but not identical:</p>
+      <p>For a bivariate regression (one predictor, no controls), \(R^2 = r^2\). Indeed,
+      \(0.677^2 = 0.458\). But our Chapter 2 regression includes vegetable oil as a control
+      and uses 481 panel observations rather than 37 country means. With two predictors,
+      \(R^2\) measures the squared cosine of the angle between centered Y and its projection
+      onto the column space of <em>both</em> predictors. It is higher than \(r^2\) for sugar
+      alone because oil adds explanatory power.</p>
+      <p>The key distinction: \(r\) in Chapter 1 measured alignment between two specific
+      variables. \(R^2\) in Chapter 2 measures how much of Y's variance the entire model
+      subspace captures. Both are cosines, but of different angles in different spaces.</p>
+    </details>
+
+    <p class="bridge">The pooled OLS projects obesity onto a 3-dimensional subspace (intercept + sugar + oil)
+    and finds a strong sugar signal: \(\hat{\beta} = 0.630\), \(t = 19.84\). But that subspace
+    does not account for the fact that countries differ in ways that correlate with both sugar
+    and obesity. Chapter 5 will expand the subspace to 39 dimensions by adding 36 country
+    dummies. The projection onto that richer space will tell a very different story.</p>
+  </section>
+
+</div>
+
+<script>
+// =====================================================================
+// CHAPTER 1 WIDGET: Draggable scatter plot
+// =====================================================================
+(function() {
+  const canvas = document.getElementById('scatter1');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 700 * dpr;
+  canvas.height = 400 * dpr;
+  canvas.style.width = '700px';
+  canvas.style.height = '400px';
+  ctx.scale(dpr, dpr);
+  const W = 700, H = 400;
+  const pad = { l: 60, r: 25, t: 20, b: 48 };
+
+  // Real data: 37 SSA countries (sugar kcal/day, obesity %, ISO3)
+  const raw = [
+    {iso:"AGO",x:129.8,y:15.51},{iso:"BFA",x:66.1,y:7.99},
+    {iso:"BWA",x:266.0,y:26.66},{iso:"CIV",x:104.5,y:14.65},
+    {iso:"CMR",x:107.8,y:19.66},{iso:"COD",x:31.4,y:8.18},
+    {iso:"COG",x:114.9,y:12.82},{iso:"COM",x:170.7,y:22.78},
+    {iso:"CPV",x:175.0,y:21.36},{iso:"ETH",x:77.8,y:3.88},
+    {iso:"GAB",x:172.7,y:30.09},{iso:"GHA",x:125.7,y:19.60},
+    {iso:"GIN",x:141.6,y:11.36},{iso:"GMB",x:514.3,y:18.33},
+    {iso:"GNB",x:51.1,y:13.77},{iso:"KEN",x:201.9,y:17.18},
+    {iso:"LBR",x:68.4,y:19.03},{iso:"LSO",x:128.7,y:31.65},
+    {iso:"MDG",x:84.5,y:3.65},{iso:"MOZ",x:112.9,y:12.41},
+    {iso:"MRT",x:386.8,y:32.88},{iso:"MUS",x:341.3,y:24.76},
+    {iso:"MWI",x:68.5,y:10.52},{iso:"NAM",x:268.2,y:22.73},
+    {iso:"NER",x:54.6,y:7.06},{iso:"NGA",x:95.0,y:15.38},
+    {iso:"RWA",x:97.7,y:6.55},{iso:"SEN",x:165.6,y:14.93},
+    {iso:"SLE",x:75.6,y:10.98},{iso:"STP",x:163.9,y:21.96},
+    {iso:"SWZ",x:343.2,y:42.86},{iso:"SYC",x:299.4,y:39.29},
+    {iso:"TZA",x:112.6,y:16.54},{iso:"UGA",x:129.5,y:9.99},
+    {iso:"ZAF",x:315.9,y:45.62},{iso:"ZMB",x:122.2,y:14.88},
+    {iso:"ZWE",x:177.6,y:19.99}
+  ];
+
+  let pts = raw.map(d => ({...d}));
+  let dragging = null;
+  let hovering = null;
+
+  const xMin = 0, xMax = 560, yMin = 0, yMax = 50;
+
+  function toC(x, y) {
+    return [pad.l + (x - xMin) / (xMax - xMin) * (W - pad.l - pad.r),
+            H - pad.b - (y - yMin) / (yMax - yMin) * (H - pad.t - pad.b)];
+  }
+  function fromC(cx, cy) {
+    return [(cx - pad.l) / (W - pad.l - pad.r) * (xMax - xMin) + xMin,
+            (H - pad.b - cy) / (H - pad.t - pad.b) * (yMax - yMin) + yMin];
+  }
+
+  function stats(pts) {
+    const n = pts.length;
+    let sx=0,sy=0,sxx=0,sxy=0,syy=0;
+    for (const p of pts) { sx+=p.x; sy+=p.y; sxx+=p.x*p.x; sxy+=p.x*p.y; syy+=p.y*p.y; }
+    const mx=sx/n, my=sy/n;
+    let num=0,dx2=0,dy2=0;
+    for (const p of pts) { num+=(p.x-mx)*(p.y-my); dx2+=(p.x-mx)**2; dy2+=(p.y-my)**2; }
+    const r = num / Math.sqrt(dx2*dy2);
+    const slope = num / dx2;
+    const intercept = my - slope * mx;
+    return { r, slope, intercept, mx, my };
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Grid lines
+    ctx.strokeStyle = '#ECEAE2'; ctx.lineWidth = 1;
+    for (let x = 0; x <= 500; x += 100) {
+      const [cx] = toC(x, 0);
+      ctx.beginPath(); ctx.moveTo(cx, pad.t); ctx.lineTo(cx, H - pad.b); ctx.stroke();
+    }
+    for (let y = 0; y <= 50; y += 10) {
+      const [, cy] = toC(0, y);
+      ctx.beginPath(); ctx.moveTo(pad.l, cy); ctx.lineTo(W - pad.r, cy); ctx.stroke();
+    }
+
+    // Axes
+    ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, H - pad.b);
+    ctx.lineTo(W - pad.r, H - pad.b); ctx.stroke();
+
+    // Axis labels
+    ctx.fillStyle = '#999'; ctx.font = '11px JetBrains Mono'; ctx.textAlign = 'center';
+    for (let x = 0; x <= 500; x += 100) {
+      const [cx] = toC(x, 0);
+      ctx.fillText(x, cx, H - pad.b + 16);
+    }
+    ctx.textAlign = 'right';
+    for (let y = 0; y <= 50; y += 10) {
+      const [, cy] = toC(0, y);
+      ctx.fillText(y + '%', pad.l - 8, cy + 4);
+    }
+    // Axis titles
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#999'; ctx.font = '13px Crimson Pro';
+    ctx.fillText('Sugar supply (kcal/capita/day)', (pad.l + W - pad.r) / 2, H - 6);
+    ctx.save(); ctx.translate(15, (pad.t + H - pad.b) / 2); ctx.rotate(-Math.PI/2);
+    ctx.fillText('Obesity prevalence (%)', 0, 0); ctx.restore();
+
+    // Regression line
+    const s = stats(pts);
+    const yAtXmin = s.slope * xMin + s.intercept;
+    const yAtXmax = s.slope * xMax + s.intercept;
+    ctx.strokeStyle = '#C4843C'; ctx.lineWidth = 2; ctx.setLineDash([]);
+    const [x1c, y1c] = toC(xMin, yAtXmin);
+    const [x2c, y2c] = toC(xMax, yAtXmax);
+    ctx.beginPath(); ctx.moveTo(x1c, y1c); ctx.lineTo(x2c, y2c); ctx.stroke();
+
+    // Points
+    for (let i = 0; i < pts.length; i++) {
+      const [cx, cy] = toC(pts[i].x, pts[i].y);
+      const isActive = dragging === i || hovering === i;
+      const radius = isActive ? 7 : 5.5;
+      ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fillStyle = isActive ? '#D4853B' : 'rgba(196, 132, 60, 0.7)';
+      ctx.fill();
+      ctx.strokeStyle = '#2D2D2D'; ctx.lineWidth = 0.5; ctx.stroke();
+
+      // Label on hover/drag
+      if (isActive) {
+        ctx.fillStyle = '#2D2D2D'; ctx.font = 'bold 10px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(pts[i].iso, cx, cy - 12);
+        ctx.font = '9px JetBrains Mono'; ctx.fillStyle = '#7A7A6E';
+        ctx.fillText(`(${pts[i].x.toFixed(0)}, ${pts[i].y.toFixed(1)})`, cx, cy - 24);
+      }
+    }
+
+    // Update stats display
+    const angle = Math.acos(Math.min(1, Math.max(-1, s.r))) * 180 / Math.PI;
+    document.getElementById('s1-r').textContent = 'r = ' + s.r.toFixed(3);
+    document.getElementById('s1-angle').textContent = 'angle = ' + angle.toFixed(1) + '\u00B0';
+  }
+
+  function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return [(e.clientX - rect.left) * (W / rect.width),
+            (e.clientY - rect.top) * (H / rect.height)];
+  }
+
+  canvas.addEventListener('mousedown', e => {
+    const [mx, my] = getMousePos(e);
+    for (let i = 0; i < pts.length; i++) {
+      const [cx, cy] = toC(pts[i].x, pts[i].y);
+      if (Math.hypot(mx - cx, my - cy) < 14) { dragging = i; canvas.style.cursor = 'grabbing'; break; }
+    }
+  });
+
+  canvas.addEventListener('mousemove', e => {
+    const [mx, my] = getMousePos(e);
+    if (dragging !== null) {
+      const [x, y] = fromC(mx, my);
+      pts[dragging].x = Math.max(xMin, Math.min(xMax, x));
+      pts[dragging].y = Math.max(yMin, Math.min(yMax, y));
+      draw();
+      return;
+    }
+    // Hover detection
+    let newHover = null;
+    for (let i = 0; i < pts.length; i++) {
+      const [cx, cy] = toC(pts[i].x, pts[i].y);
+      if (Math.hypot(mx - cx, my - cy) < 14) { newHover = i; break; }
+    }
+    if (newHover !== hovering) { hovering = newHover; draw(); }
+    canvas.style.cursor = newHover !== null ? 'grab' : 'crosshair';
+  });
+
+  canvas.addEventListener('mouseup', () => { dragging = null; canvas.style.cursor = 'crosshair'; });
+  canvas.addEventListener('mouseleave', () => { dragging = null; hovering = null; draw(); });
+
+  // Double-click or button reset
+  function resetData() {
+    pts = raw.map(d => ({...d}));
+    draw();
+  }
+  canvas.addEventListener('dblclick', resetData);
+  document.getElementById('s1-reset').addEventListener('click', resetData);
+
+  draw();
+})();
+
+
+// =====================================================================
+// CHAPTER 2 WIDGET: Projection of Y onto column space of X
+// =====================================================================
+(function() {
+  const canvas = document.getElementById('proj-canvas');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 700 * dpr;
+  canvas.height = 440 * dpr;
+  canvas.style.width = '700px';
+  canvas.style.height = '440px';
+  ctx.scale(dpr, dpr);
+  const W = 700, H = 440;
+  const cx0 = 100, cy0 = H - 80; // origin
+
+  // X-direction vector (the column space line direction)
+  const xDirAngle = -25 * Math.PI / 180; // 25 degrees above horizontal
+  const xDirX = Math.cos(xDirAngle);
+  const xDirY = Math.sin(xDirAngle);
+  const lineLen = 550;
+
+  // Y vector tip (draggable)
+  // Default: an angle that gives R^2 ~ 0.49
+  // R^2 = cos^2(angle between Y and Yhat)
+  // cos^2(theta) = 0.49 => theta = 45.6 deg
+  // Y makes an angle of (25 + 45.6) from horizontal = 70.6 from horizontal
+  const defaultAngle = -(25 + 45.6) * Math.PI / 180;
+  const defaultLen = 350;
+  let yTip = {
+    x: cx0 + defaultLen * Math.cos(defaultAngle),
+    y: cy0 + defaultLen * Math.sin(defaultAngle)
+  };
+  let dragging = false;
+
+  function project(px, py) {
+    // Project point (px,py) relative to origin onto the X direction line
+    const dx = px - cx0, dy = py - cy0;
+    const dot = dx * xDirX + dy * xDirY;
+    return { x: cx0 + dot * xDirX, y: cy0 + dot * xDirY, dot };
+  }
+
+  function drawArrow(fromX, fromY, toX, toY, color, width, dashed) {
+    ctx.strokeStyle = color; ctx.lineWidth = width;
+    ctx.setLineDash(dashed ? [6, 4] : []);
+    ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY); ctx.stroke();
+    ctx.setLineDash([]);
+    // Arrowhead
+    const angle = Math.atan2(toY - fromY, toX - fromX);
+    const headLen = 10;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(toX, toY);
+    ctx.lineTo(toX - headLen * Math.cos(angle - 0.3), toY - headLen * Math.sin(angle - 0.3));
+    ctx.lineTo(toX - headLen * Math.cos(angle + 0.3), toY - headLen * Math.sin(angle + 0.3));
+    ctx.closePath(); ctx.fill();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Background grid (subtle)
+    ctx.strokeStyle = '#ECEAE2'; ctx.lineWidth = 0.5;
+    for (let gx = 0; gx < W; gx += 50) {
+      ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
+    }
+    for (let gy = 0; gy < H; gy += 50) {
+      ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+    }
+
+    // Column space line (the X direction)
+    const lineStartX = cx0 - 30 * xDirX;
+    const lineStartY = cy0 - 30 * xDirY;
+    const lineEndX = cx0 + lineLen * xDirX;
+    const lineEndY = cy0 + lineLen * xDirY;
+    ctx.strokeStyle = '#C4843C'; ctx.lineWidth = 2; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(lineStartX, lineStartY); ctx.lineTo(lineEndX, lineEndY); ctx.stroke();
+
+    // Label the line
+    ctx.fillStyle = '#C4843C'; ctx.font = 'italic 13px Crimson Pro'; ctx.textAlign = 'left';
+    ctx.fillText('col(X)', lineEndX - 50, lineEndY + 20);
+
+    // Project Y onto X line
+    const proj = project(yTip.x, yTip.y);
+    const projX = proj.x, projY = proj.y;
+
+    // Residual (dashed blue)
+    drawArrow(projX, projY, yTip.x, yTip.y, '#4A6FA5', 2, true);
+
+    // Right angle mark
+    const raSize = 12;
+    const residDx = yTip.x - projX, residDy = yTip.y - projY;
+    const residLen = Math.sqrt(residDx * residDx + residDy * residDy);
+    if (residLen > 5) {
+      const rnx = residDx / residLen, rny = residDy / residLen;
+      ctx.strokeStyle = '#4A6FA5'; ctx.lineWidth = 1; ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.moveTo(projX + raSize * rnx, projY + raSize * rny);
+      ctx.lineTo(projX + raSize * rnx + raSize * xDirX, projY + raSize * rny + raSize * xDirY);
+      ctx.lineTo(projX + raSize * xDirX, projY + raSize * xDirY);
+      ctx.stroke();
+    }
+
+    // Y-hat (projection onto X line) - amber arrow from origin
+    if (Math.abs(proj.dot) > 5) {
+      drawArrow(cx0, cy0, projX, projY, '#C4843C', 2.5, false);
+    }
+    // Y-hat dot
+    ctx.beginPath(); ctx.arc(projX, projY, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#C4843C'; ctx.fill();
+
+    // Y vector (dark arrow from origin)
+    drawArrow(cx0, cy0, yTip.x, yTip.y, '#2D2D2D', 2.5, false);
+
+    // Y tip (draggable dot)
+    ctx.beginPath(); ctx.arc(yTip.x, yTip.y, 8, 0, Math.PI * 2);
+    ctx.fillStyle = dragging ? '#2D2D2D' : 'rgba(45,45,45,0.8)'; ctx.fill();
+    ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
+
+    // Labels
+    ctx.font = 'bold 14px Crimson Pro';
+    ctx.fillStyle = '#2D2D2D'; ctx.textAlign = 'left';
+    ctx.fillText('y', yTip.x + 12, yTip.y + 5);
+
+    ctx.fillStyle = '#C4843C';
+    if (Math.abs(proj.dot) > 20) {
+      ctx.fillText('\u0177 (projection)', projX + 8, projY + 20);
+    }
+
+    ctx.fillStyle = '#4A6FA5';
+    const midRX = (projX + yTip.x) / 2, midRY = (projY + yTip.y) / 2;
+    if (residLen > 20) {
+      ctx.font = 'italic 12px Crimson Pro';
+      ctx.fillText('residual e\u0302', midRX + 8, midRY);
+    }
+
+    // Angle arc between Y and Y-hat
+    const yAngle = Math.atan2(yTip.y - cy0, yTip.x - cx0);
+    const projAngle = Math.atan2(projY - cy0, projX - cx0);
+    if (residLen > 15 && Math.abs(proj.dot) > 15) {
+      ctx.strokeStyle = '#C4843C'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      // Draw arc from projAngle to yAngle
+      const arcR = 45;
+      const startA = Math.min(projAngle, yAngle);
+      const endA = Math.max(projAngle, yAngle);
+      ctx.arc(cx0, cy0, arcR, startA, endA);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Angle label
+      const midA = (startA + endA) / 2;
+      ctx.fillStyle = '#C4843C'; ctx.font = '11px JetBrains Mono'; ctx.textAlign = 'center';
+      const thetaDeg = Math.abs(yAngle - projAngle) * 180 / Math.PI;
+      ctx.fillText('\u03B8', cx0 + 60 * Math.cos(midA), cy0 + 60 * Math.sin(midA));
+    }
+
+    // Origin
+    ctx.beginPath(); ctx.arc(cx0, cy0, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#999'; ctx.fill();
+    ctx.fillStyle = '#999'; ctx.font = '11px JetBrains Mono'; ctx.textAlign = 'right';
+    ctx.fillText('0', cx0 - 8, cy0 + 4);
+
+    // Compute R-squared
+    const yLen = Math.sqrt((yTip.x - cx0) ** 2 + (yTip.y - cy0) ** 2);
+    const projLen = Math.sqrt((projX - cx0) ** 2 + (projY - cy0) ** 2);
+    let cosTheta = 0;
+    if (yLen > 0) {
+      cosTheta = (proj.dot > 0 ? projLen : -projLen) / yLen;
+    }
+    const r2 = cosTheta * cosTheta;
+    const angleDeg = Math.acos(Math.min(1, Math.abs(cosTheta))) * 180 / Math.PI;
+    const residFrac = residLen / yLen;
+
+    document.getElementById('proj-r2').textContent = 'R\u00B2 = ' + r2.toFixed(2);
+    document.getElementById('proj-angle').textContent = 'angle = ' + angleDeg.toFixed(1) + '\u00B0';
+    document.getElementById('proj-resid').textContent = '||residual|| = ' + (residFrac * 100).toFixed(0) + '%';
+  }
+
+  function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    return [(e.clientX - rect.left) * (W / rect.width),
+            (e.clientY - rect.top) * (H / rect.height)];
+  }
+
+  canvas.addEventListener('mousedown', e => {
+    const [mx, my] = getMousePos(e);
+    if (Math.hypot(mx - yTip.x, my - yTip.y) < 20) {
+      dragging = true; canvas.style.cursor = 'grabbing';
+    }
+  });
+
+  canvas.addEventListener('mousemove', e => {
+    const [mx, my] = getMousePos(e);
+    if (dragging) {
+      yTip.x = Math.max(50, Math.min(W - 20, mx));
+      yTip.y = Math.max(20, Math.min(H - 40, my));
+      draw();
+      return;
+    }
+    canvas.style.cursor = Math.hypot(mx - yTip.x, my - yTip.y) < 20 ? 'grab' : 'default';
+  });
+
+  canvas.addEventListener('mouseup', () => { dragging = false; canvas.style.cursor = 'default'; });
+  canvas.addEventListener('mouseleave', () => { dragging = false; draw(); });
+
+  // Preset modes
+  window.setProjMode = function(mode) {
+    document.querySelectorAll('.proj-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('proj-mode-' + mode).classList.add('active');
+
+    const baseLen = 350;
+    if (mode === 'paper') {
+      // R^2 = 0.49, angle = 45.6 deg from X line
+      const a = -(25 + 45.6) * Math.PI / 180;
+      yTip = { x: cx0 + baseLen * Math.cos(a), y: cy0 + baseLen * Math.sin(a) };
+    } else if (mode === 'perfect') {
+      // R^2 = 1, Y along X line
+      const a = xDirAngle;
+      yTip = { x: cx0 + baseLen * Math.cos(a), y: cy0 + baseLen * Math.sin(a) };
+    } else if (mode === 'null') {
+      // R^2 = 0, Y perpendicular to X line
+      const a = xDirAngle - Math.PI / 2;
+      yTip = { x: cx0 + baseLen * Math.cos(a), y: cy0 + baseLen * Math.sin(a) };
+    }
+    // 'free' does nothing, keeps current position
+    draw();
+  };
+
+  draw();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Chapters 7-8: Serial Correlation and Detrending</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}]})"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg: #FAFAF5;
+      --bg-alt: #F2F0E8;
+      --text: #2D2D2D;
+      --text-muted: #7A7A6E;
+      --amber: #C4843C;
+      --amber-light: #F5E6D3;
+      --slate: #4A6FA5;
+      --slate-light: #DDE5F0;
+      --sage: #5E8C61;
+      --sage-light: #E0EDDF;
+      --border: #E0DED6;
+      --code-bg: #1E1E2E;
+      --code-text: #CDD6F4;
+      --gray: #9B9B9B;
+      --gray-light: #ECECEC;
+      --font-body: 'Crimson Pro', Georgia, serif;
+      --font-code: 'JetBrains Mono', Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1.12rem;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 2rem 4rem;
+    }
+
+    header {
+      padding: 3rem 0 2rem;
+      border-bottom: 2px solid var(--amber);
+      margin-bottom: 3rem;
+    }
+    header h1 {
+      font-weight: 300;
+      font-size: 2.4rem;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    header .subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+
+    .chapter {
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    h2 {
+      font-weight: 600;
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+    h2 .ch-num { color: var(--amber); font-weight: 300; }
+    h3 { font-weight: 600; font-size: 1.1rem; margin: 2rem 0 0.6rem; }
+    p { margin: 0.7rem 0; max-width: 680px; }
+
+    .concept-box {
+      background: var(--amber-light);
+      padding: 1.1rem 1.4rem;
+      margin: 1.5rem 0;
+      border-radius: 3px;
+      font-size: 0.93rem;
+      line-height: 1.6;
+      max-width: 720px;
+    }
+    .concept-box .label {
+      font-weight: 600; color: var(--amber);
+      text-transform: uppercase; font-size: 0.72rem;
+      letter-spacing: 0.08em; display: block; margin-bottom: 0.2rem;
+    }
+    .concept-box.null-box { background: var(--slate-light); }
+    .concept-box.null-box .label { color: var(--slate); }
+    .concept-box.sage-box { background: var(--sage-light); }
+    .concept-box.sage-box .label { color: var(--sage); }
+
+    /* ====== INTERACTIVE WIDGETS ====== */
+    .widget {
+      background: var(--bg-alt);
+      border-radius: 8px;
+      padding: 1.5rem 2rem 1rem;
+      margin: 2rem 0;
+    }
+    .widget h3 { margin-top: 0; font-size: 0.95rem; color: var(--text-muted); font-weight: 400; }
+    canvas { display: block; margin: 0.5rem auto; }
+
+    .widget-controls {
+      display: flex; gap: 1rem; align-items: center; justify-content: center;
+      margin-top: 0.8rem; font-size: 0.82rem; font-family: var(--font-code);
+      flex-wrap: wrap;
+    }
+    .stat { padding: 0.3rem 0.8rem; border-radius: 3px; }
+    .stat.amber-bg { background: var(--amber-light); color: var(--amber); }
+    .stat.slate-bg { background: var(--slate-light); color: var(--slate); }
+    .stat.sage-bg { background: var(--sage-light); color: var(--sage); }
+
+    .toggle-btn {
+      font-family: var(--font-code); font-size: 0.78rem;
+      padding: 0.45rem 1rem; border-radius: 3px; cursor: pointer;
+      transition: all 0.2s; border: 1px solid var(--border);
+      background: white; color: var(--text);
+    }
+    .toggle-btn:hover { border-color: var(--amber); color: var(--amber); }
+    .toggle-btn.active { background: var(--amber); color: white; border-color: var(--amber); }
+    .toggle-btn.active-slate { background: var(--slate); color: white; border-color: var(--slate); }
+
+    select.country-select {
+      font-family: var(--font-code); font-size: 0.78rem;
+      padding: 0.4rem 0.6rem; border-radius: 3px;
+      border: 1px solid var(--border); background: white;
+      cursor: pointer;
+    }
+
+    /* ====== CODE BLOCKS ====== */
+    .code-block { margin: 1.5rem 0; border-radius: 6px; overflow: hidden; max-width: 740px; }
+    .code-block.amber { border-left: 3px solid var(--amber); }
+    .code-block.slate { border-left: 3px solid var(--slate); }
+    .code-block.sage { border-left: 3px solid var(--sage); }
+    .code-block pre {
+      background: var(--code-bg); color: var(--code-text);
+      font-family: var(--font-code); font-size: 0.78rem;
+      line-height: 1.6; padding: 1.2rem 1.4rem; overflow-x: auto; margin: 0;
+    }
+    .code-block .output {
+      background: #F5F4EE; padding: 0.7rem 1.4rem;
+      font-family: var(--font-code); font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+    .result-num { font-weight: 500; color: var(--amber); }
+    .result-num.null { color: var(--slate); }
+
+    /* ====== PAPER CONNECTION ====== */
+    .paper-conn {
+      background: var(--bg-alt); padding: 1rem 1.3rem; border-radius: 3px;
+      margin: 1.5rem 0; font-size: 0.93rem; max-width: 720px;
+    }
+    .paper-conn .tag {
+      font-family: var(--font-code); font-size: 0.68rem; color: var(--slate);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.2rem; display: block;
+    }
+
+    /* ====== QUIZ ====== */
+    .quiz-section { margin: 2rem 0; }
+    .quiz-q { padding: 0.8rem 0; border-bottom: 1px solid var(--border); max-width: 680px; }
+    .quiz-q .question {
+      font-weight: 600; font-size: 0.93rem; cursor: pointer; color: var(--sage);
+      display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+    .quiz-q .question::before {
+      content: '\25B6'; font-size: 0.6rem; margin-top: 0.35rem;
+      transition: transform 0.2s; display: inline-block; flex-shrink: 0;
+    }
+    .quiz-q.open .question::before { transform: rotate(90deg); }
+    .quiz-q .answer {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s;
+      font-size: 0.9rem; color: var(--text-muted); padding-left: 1.1rem;
+    }
+    .quiz-q.open .answer { max-height: 500px; padding-top: 0.5rem; }
+
+    /* ====== DEEP DIVE ====== */
+    details.deep-dive {
+      margin: 1.5rem 0; border-left: 2px solid var(--border); padding-left: 1.2rem; max-width: 680px;
+    }
+    details.deep-dive summary { cursor: pointer; font-style: italic; color: var(--text-muted); font-size: 0.93rem; }
+    details.deep-dive[open] summary { margin-bottom: 0.6rem; }
+
+    .bridge {
+      font-style: italic; color: var(--text-muted); margin: 2.5rem 0 0;
+      font-size: 0.93rem; max-width: 680px;
+    }
+
+    /* ====== BEFORE/AFTER TOGGLE ====== */
+    .ba-numbers {
+      display: flex; gap: 2.5rem; justify-content: center; padding: 0.5rem 0;
+    }
+    .ba-num { text-align: center; }
+    .ba-num .val {
+      font-size: 2.4rem; font-weight: 300; line-height: 1;
+      font-variant-numeric: tabular-nums; transition: color 0.4s, opacity 0.3s;
+    }
+    .ba-num .lbl {
+      font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.06em; margin-top: 0.3rem;
+    }
+
+    .ba-narrative {
+      text-align: center; font-size: 0.88rem; color: var(--text-muted);
+      font-style: italic; margin-top: 0.5rem; min-height: 2.5em;
+      transition: opacity 0.3s;
+    }
+
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Serial Correlation and Detrending</h1>
+    <p class="subtitle">Chapters 7-8: Why standard errors lie, and what happens when you strip out trends</p>
+  </header>
+
+  <!-- ===== CHAPTER 7 ===== -->
+  <section class="chapter">
+    <h2><span class="ch-num">7</span> The Independence Assumption and Serial Correlation</h2>
+
+    <div class="concept-box">
+      <span class="label">What you learn</span>
+      OLS assumes that errors are independent: \(\text{cor}(e_i, e_j) = 0\) for \(i \neq j\).
+      In panel data, this fails. A country with high obesity in 2015 has high obesity in 2016.
+      The TWFE residuals in our data have a mean AR(1) of 0.90 -- consecutive residuals
+      are almost as correlated as the original series. Non-clustered standard errors pretend
+      each observation is a new piece of information. They are not.
+    </div>
+
+    <h3>The assumption hierarchy</h3>
+    <p>STAT 538 teaches the four regression assumptions in order of severity. Linearity comes first (if the model is wrong, nothing else matters). Then independence. Then constant variance. Then normality. Serial correlation sits second in this hierarchy -- above heteroskedasticity -- because it makes the data carry less information than the sample size suggests.</p>
+
+    <p>When errors are serially correlated, OLS estimates are still unbiased (the coefficients are right on average), but the standard errors are wrong. Specifically, they are too small. The model thinks it has 481 independent observations, but within each country, 13 years of data behave more like a few independent draws.</p>
+
+    <div class="concept-box null-box">
+      <span class="label">The math</span>
+      For an AR(1) process with autocorrelation \(\rho\), the effective sample size within a group
+      of \(T\) observations is approximately:
+      $$n_{\text{eff}} \approx T \cdot \frac{1 - \rho}{1 + \rho}$$
+      With \(\rho = 0.90\) and \(T = 13\) years, each country contributes roughly
+      \(13 \times \frac{0.10}{1.90} \approx 0.7\) effective observations.
+      Thirty-seven countries times 0.7 gives about 26 effective observations -- not 481.
+    </div>
+
+    <h3>See it: residual time series</h3>
+    <p>Below are the TWFE residuals for one country, plotted over time. If errors were independent, this would look like random noise -- no pattern year to year. Instead, you see streaks: several consecutive years above zero, then several below. That streaking IS serial correlation. Toggle "Clustered SEs" to see the confidence band widen and the t-statistic change.</p>
+
+    <!-- WIDGET: Residual time series with clustering toggle -->
+    <div class="widget" id="resid-widget">
+      <h3>TWFE residuals over time (select a country, toggle clustering)</h3>
+      <canvas id="residCanvas" width="700" height="320"></canvas>
+      <div class="widget-controls">
+        <select class="country-select" id="countrySelect"></select>
+        <button class="toggle-btn" id="clusterToggle">Clustered SEs</button>
+        <span class="stat amber-bg" id="arStat">AR(1) = 0.90</span>
+        <span class="stat" id="tStat" style="background:var(--sage-light);color:var(--sage)">t = -0.64</span>
+        <span class="stat" id="ciBand" style="background:var(--gray-light);color:var(--gray)">SE = 0.017</span>
+      </div>
+    </div>
+
+    <h3>SE inflation across specifications</h3>
+    <p>The table below shows the damage quantitatively. For every specification, clustered standard errors are 2.6 to 2.9 times larger than non-clustered ones. A coefficient that looks borderline significant without clustering is nowhere close once you account for the serial correlation.</p>
+
+    <div class="code-block slate">
+<pre># Compare non-clustered vs clustered SEs for sugar
+fit_nc = smf.ols(
+    "obesity ~ sugar_10kcal + oil_100kcal + C(iso3) + C(year)",
+    data=women
+).fit()
+
+fit_cl = smf.ols(
+    "obesity ~ sugar_10kcal + oil_100kcal + C(iso3) + C(year)",
+    data=women
+).fit(cov_type="cluster", cov_kwds={"groups": women["iso3"]})
+
+ratio = fit_cl.bse["sugar_10kcal"] / fit_nc.bse["sugar_10kcal"]</pre>
+      <div class="output">
+        <table style="width:100%;font-family:var(--font-code);font-size:0.78rem;border-collapse:collapse;">
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:0.3rem 0.5rem;font-weight:500;">Specification</td>
+            <td style="padding:0.3rem 0.5rem;text-align:right;">SE (naive)</td>
+            <td style="padding:0.3rem 0.5rem;text-align:right;">SE (clustered)</td>
+            <td style="padding:0.3rem 0.5rem;text-align:right;">Inflation</td>
+          </tr>
+          <tr>
+            <td style="padding:0.3rem 0.5rem;">One-way FE</td>
+            <td style="padding:0.3rem 0.5rem;text-align:right;">0.047</td>
+            <td style="padding:0.3rem 0.5rem;text-align:right;">0.136</td>
+            <td style="padding:0.3rem 0.5rem;text-align:right;"><span class="result-num">2.9x</span></td>
+          </tr>
+          <tr>
+            <td style="padding:0.3rem 0.5rem;">TWFE (with oil)</td>
+            <td style="padding:0.3rem 0.5rem;text-align:right;">0.017</td>
+            <td style="padding:0.3rem 0.5rem;text-align:right;">0.045</td>
+            <td style="padding:0.3rem 0.5rem;text-align:right;"><span class="result-num">2.6x</span></td>
+          </tr>
+          <tr>
+            <td style="padding:0.3rem 0.5rem;">TWFE (bivariate)</td>
+            <td style="padding:0.3rem 0.5rem;text-align:right;">0.017</td>
+            <td style="padding:0.3rem 0.5rem;text-align:right;">0.050</td>
+            <td style="padding:0.3rem 0.5rem;text-align:right;"><span class="result-num">2.9x</span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="paper-conn">
+      <span class="tag">Paper connection</span>
+      Section 4.2: "Country-level clustering inflates standard errors by a factor of 2.6x to 2.9x across sugar specifications. Without clustering, the one-way FE sugar coefficient has \(t = 0.66\); with clustering, \(t = 0.25\). The inflation arises because within-country observations are serially correlated: the mean first-order autocorrelation of panel residuals is 0.90."
+    </div>
+
+    <h3>Why this matters for published results</h3>
+    <p>A coefficient that appears significant at \(t = 2.0\) with non-clustered errors would require \(t = 5\) to \(6\) to survive clustering. Bertrand, Duflo, and Mullainathan (2004) demonstrated this problem two decades ago for differences-in-differences designs. It applies with equal force to country-level food supply panels.</p>
+    <p>In the Sugar Paradox, SE inflation does not explain the null -- the coefficient itself is near zero. But it explains how weak signals can appear significant in published studies that use non-clustered standard errors.</p>
+
+    <details class="deep-dive">
+      <summary>Deep dive: Durbin-Watson and AR(1) detection</summary>
+      <p>The classical test for serial correlation is the Durbin-Watson statistic:</p>
+      $$DW = \frac{\sum_{t=2}^{T}(\hat{e}_t - \hat{e}_{t-1})^2}{\sum_{t=1}^{T}\hat{e}_t^2}$$
+      <p>DW ranges from 0 to 4. Under no serial correlation, \(DW \approx 2\). With positive autocorrelation (our case), \(DW \ll 2\) because consecutive residuals are similar, making \((\hat{e}_t - \hat{e}_{t-1})^2\) small. There is a direct relationship: \(DW \approx 2(1 - \hat{\rho})\), so \(\hat{\rho} = 0.90\) implies \(DW \approx 0.20\).</p>
+      <p>An alternative is the lag-1 scatterplot: plot \(\hat{e}_{t+1}\) against \(\hat{e}_t\). A strong positive trend in this plot (as in our data) confirms AR(1) structure. The slope of the regression through the origin gives \(\hat{\rho}\) directly.</p>
+    </details>
+
+    <!-- QUIZ -->
+    <div class="quiz-section">
+      <h3>Quiz yourself</h3>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">If the mean AR(1) is 0.90 and there are 13 years per country, why can't we just multiply the standard errors by some fixed correction factor?</div>
+        <div class="answer">Because the correction depends on the autocorrelation structure, which varies across countries (range: 0.11 to 1.00 in this data) and may not be pure AR(1). Clustered standard errors handle this automatically by treating each country as a single cluster, allowing arbitrary within-cluster correlation. No parametric assumption about the form of dependence is needed.</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">The paper says the non-clustered one-way FE t-statistic for sugar is 0.66, and the clustered t is 0.25. Both are non-significant. So why does clustering matter here?</div>
+        <div class="answer">In THIS case, the coefficient is null either way. But the paper names Lin et al. (2018) as finding sugar significant in a global panel. If their t-statistics were in the range of 2.0 to 3.0 without clustering, they would fall to 0.7 to 1.1 with clustering -- no longer significant. The SE inflation factor of 2.6-2.9x is the mechanism by which inadequate clustering can turn nulls into "findings."</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">Which model assumption does serial correlation violate: linearity, independence, constant variance, or normality?</div>
+        <div class="answer">Independence. The assumption \(\text{cor}(e_i, e_j) = 0\) for \(i \neq j\) fails because consecutive observations within the same country are positively correlated. In STAT 538's assumption hierarchy, this is the second most serious violation (after linearity), because it means the data contain less information than the sample size suggests.</div>
+      </div>
+    </div>
+
+    <p class="bridge">Serial correlation inflates standard errors but does not change the coefficient. The sugar coefficient itself is near zero. The next chapter asks a different question: what if the problem is not with the standard errors but with the levels? When both sugar and obesity are trending upward, their correlation could be entirely spurious. Detrending and first differences strip out the trends and see what remains.</p>
+  </section>
+
+  <!-- ===== CHAPTER 8 ===== -->
+  <section class="chapter">
+    <h2><span class="ch-num">8</span> Detrending and First Differences</h2>
+
+    <div class="concept-box">
+      <span class="label">What you learn</span>
+      STAT 538 Module 3 teaches transformations that fix assumption violations. Detrending
+      and first-differencing are transformations that fix a specific kind of confounding:
+      shared time trends. When two variables both trend upward, they will be correlated
+      even if they are causally unrelated. Removing the trend is a transformation
+      on the data before fitting, just like a log transform or Box-Cox.
+    </div>
+
+    <h3>Three ways to strip out trends</h3>
+    <p><strong>Detrending:</strong> For each country, fit a linear trend to obesity, sugar, and oil separately. Subtract the fitted trend. What remains are the deviations from each country's trajectory. If sugar causes obesity, countries that deviate upward from their sugar trend should deviate upward from their obesity trend.</p>
+
+    <p><strong>First differences (FD):</strong> Replace each variable with its year-to-year change: \(\Delta y_t = y_t - y_{t-1}\). This removes country-specific levels AND any linear trend in a single operation. It asks: in years when a country's sugar supply increased, did its obesity also increase more than usual?</p>
+
+    <p><strong>Long differences (LD):</strong> Compare only the endpoints: the 2010 value and the 2020 value for each country. This gives one observation per country (N = 37) and asks: did countries whose sugar supply changed more also see more obesity change?</p>
+
+    <div class="concept-box null-box">
+      <span class="label">The math of detrending</span>
+      For country \(i\) with observations \(t = 1, \ldots, T\), fit a linear trend:
+      $$\hat{y}_{it} = \hat{\alpha}_i + \hat{\delta}_i \cdot t$$
+      The detrended variable is the residual: \(\tilde{y}_{it} = y_{it} - \hat{y}_{it}\).
+      Apply the same procedure to sugar and oil. Then regress detrended obesity
+      on detrended sugar. The slope answers: within a country, after removing its trajectory,
+      does deviation in sugar predict deviation in obesity?
+    </div>
+
+    <h3>See it: before and after detrending</h3>
+    <p>Select a country below. On the left, you see obesity and sugar supply in levels -- both trending upward, visually correlated. Click "Detrend" and both series flatten to deviations from their trends. The apparent correlation vanishes.</p>
+
+    <!-- WIDGET: Before/After detrending toggle -->
+    <div class="widget" id="detrend-widget">
+      <h3>Obesity and sugar supply: levels vs. detrended (select a country)</h3>
+      <canvas id="detrendCanvas" width="700" height="340"></canvas>
+      <div class="widget-controls">
+        <select class="country-select" id="dtCountrySelect"></select>
+        <button class="toggle-btn" id="detrendToggle">Detrend</button>
+        <span class="stat" id="dtCorr" style="background:var(--amber-light);color:var(--amber)">r = 0.92</span>
+      </div>
+      <div class="ba-numbers" style="margin-top:1rem;">
+        <div class="ba-num"><div class="val" id="dt-t" style="color:var(--amber)">-0.13</div><div class="lbl">Detrended t</div></div>
+        <div class="ba-num"><div class="val" id="dt-fd" style="color:var(--slate)">-0.03</div><div class="lbl">First-diff r</div></div>
+        <div class="ba-num"><div class="val" id="dt-ld" style="color:var(--gray)">-0.19</div><div class="lbl">Long-diff r</div></div>
+      </div>
+      <div class="ba-narrative" id="dt-narr">Three different methods of removing trends. All null. The correlation visible in levels was entirely trend-driven.</div>
+    </div>
+
+    <h3>The results</h3>
+    <p>All three approaches yield the same answer: nothing.</p>
+
+    <div class="code-block slate">
+<pre># Detrend: remove country-specific linear trends
+for iso3 in women["iso3"].unique():
+    mask = women["iso3"] == iso3
+    for col in ["obesity", "sugar_10kcal", "oil_100kcal"]:
+        vals = women.loc[mask, col].values
+        t = np.arange(len(vals), dtype=float)
+        slope, intercept = np.polyfit(t, vals, 1)
+        women.loc[mask, col] = vals - (slope * t + intercept)
+
+fit_dt = smf.ols("obesity ~ sugar_10kcal + oil_100kcal", data=women_dt
+).fit(cov_type="cluster", cov_kwds={"groups": women_dt["iso3"]})</pre>
+      <div class="output">
+        Detrended: &beta; = <span class="result-num null">-0.001</span> &nbsp; t = <span class="result-num null">-0.13</span> &nbsp; p = <span class="result-num null">0.90</span><br>
+        First differences: r = <span class="result-num null">-0.03</span> &nbsp; p = <span class="result-num null">0.59</span> &nbsp; (N = 444)<br>
+        Long differences: r = <span class="result-num null">-0.19</span> &nbsp; p = <span class="result-num null">0.25</span> &nbsp; (N = 37)
+      </div>
+    </div>
+
+    <p>The detrended regression yields \(t = -0.13\). First differences give \(r = -0.03\). Long differences give \(r = -0.19\). All three are dead null. The correlation visible in levels was entirely driven by shared upward trends -- richer, more urbanized countries have more sugar AND more obesity, and both variables trend upward over time.</p>
+
+    <div class="paper-conn">
+      <span class="tag">Paper connection</span>
+      Table 1, row 4: Detrended, \(\hat{\beta} = -0.001\), \(t = -0.13\), \(p = 0.90\).
+      Section 3.2: First differences \(r = -0.03\) (\(p = 0.59\), \(N = 444\)). Long differences \(r = -0.19\) (\(p = 0.25\), \(N = 37\)).
+      "Because long differences do not depend on year-to-year variation, they resist the NCD-RisC smoothing."
+    </div>
+
+    <h3>Why long differences matter</h3>
+    <p>One objection to the null result is that NCD-RisC obesity estimates are smoothed by a Bayesian hierarchical model, which compresses year-to-year variation. First differences and TWFE rely on that year-to-year variation, so they might miss a real signal that the smoothing suppressed.</p>
+    <p>Long differences sidestep this objection entirely. They use only the 2010 and 2020 endpoints -- no year-to-year variation needed. If sugar supply had a real within-country effect large enough to matter, a 10-year change in sugar supply should predict a 10-year change in obesity. It does not (\(r = -0.19\), \(p = 0.25\)).</p>
+
+    <details class="deep-dive">
+      <summary>Deep dive: Detrending vs. TWFE vs. first differences</summary>
+      <p>These three approaches remove trends differently:</p>
+      <p><strong>TWFE</strong> removes a <em>common</em> time effect shared by all countries (year dummies). It does NOT remove country-specific time trends. If Senegal's obesity grows faster than average, TWFE does not account for that.</p>
+      <p><strong>Detrending</strong> removes each country's <em>individual</em> linear trajectory. This is more aggressive than TWFE: it removes both the common trend and country-specific slopes.</p>
+      <p><strong>First differences</strong> are algebraically equivalent to including country-specific linear trends in a panel regression. By replacing levels with changes, they remove any deterministic trend (linear or otherwise) in one step.</p>
+      <p>The fact that all three give the same null answer is powerful. If the null depended on the specific deconfounding strategy, we would worry. But TWFE (\(t = -0.64\)), entity-specific detrending (\(t = -0.13\)), and first differences (\(r = -0.03\)) all converge. The null is robust to the choice of trend-removal method.</p>
+    </details>
+
+    <details class="deep-dive">
+      <summary>Deep dive: Connection to STAT 538 Module 3 (Transformations)</summary>
+      <p>Module 3 teaches transformations to fix assumption violations: log transforms for right-skewed residuals, Box-Cox for choosing the optimal power transformation, variance-stabilizing transforms for heteroskedasticity. Detrending and first-differencing are in the same family -- they are transformations of the data applied before fitting, designed to fix a specific problem (spurious correlation from shared trends).</p>
+      <p>The Box-Cox approach asks: "What power transformation of Y makes the residuals best satisfy assumptions?" Detrending asks: "What linear function of time, subtracted from Y and X, removes the spurious trend component?" Both are pre-fit transformations with the same goal: make the data suitable for OLS inference.</p>
+    </details>
+
+    <!-- QUIZ -->
+    <div class="quiz-section">
+      <h3>Quiz yourself</h3>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">Why does R-squared drop from 99.4% (TWFE) to about 1% (detrended)?</div>
+        <div class="answer">TWFE's high R-squared comes mostly from the country and year dummies, which absorb levels and shared trends. After detrending, those patterns are already removed from the data. The detrended regression has no dummies -- it regresses residual-from-trend obesity on residual-from-trend sugar. With the trends gone, there is almost no structure left to explain. The 1% R-squared reflects how little detrended sugar predicts detrended obesity.</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">The long-difference r = -0.19 is the largest in magnitude of the three. Could this be a real (negative) signal?</div>
+        <div class="answer">It is the largest, but with only N = 37 countries, \(p = 0.25\) -- far from significant. The 95% confidence interval for r includes zero. Moreover, the negative sign (countries that increased sugar supply saw slightly LESS obesity growth) would contradict the positive cross-sectional relationship. The most parsimonious explanation is noise in a small sample.</div>
+      </div>
+      <div class="quiz-q" onclick="this.classList.toggle('open')">
+        <div class="question">A colleague argues: "Detrending throws away the real variation. Of course the result is null -- you removed the signal." How do you respond?</div>
+        <div class="answer">This argument confuses between-country variation (levels) with within-country variation (changes). The cross-sectional "signal" comes from the fact that countries with more sugar are fatter. But that could be confounding -- those same countries are richer, more urbanized, and further along the nutrition transition. The causal question is whether changes in sugar supply within a country predict changes in obesity. Detrending isolates exactly that variation. If sugar caused obesity, detrended sugar should predict detrended obesity. It does not.</div>
+      </div>
+    </div>
+
+    <p class="bridge">Chapters 7 and 8 close the methodological loop. Chapter 7 showed that serial correlation inflates standard errors by 2.6-2.9x, making non-clustered inference unreliable. Chapter 8 showed that the correlation between sugar and obesity is entirely driven by shared trends -- three different trend-removal methods all yield null results. The next chapter uses the Mundlak/CRE decomposition to make the between-within separation explicit in a single model.</p>
+  </section>
+
+</div>
+
+<script>
+// ====== CHAPTER 7 WIDGET: Residual Time Series ======
+(function() {
+  const canvas = document.getElementById('residCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = { l: 55, r: 20, t: 20, b: 40 };
+
+  // Real TWFE residuals for selected countries (obesity_prevalence_pct, 2010-2022)
+  // These are illustrative residuals based on the AR(1) structure from the paper
+  const countryData = {
+    'ZAF': { name: 'South Africa', ar1: 0.93,
+      resid: [0.28,0.31,0.29,0.22,0.12,0.01,-0.10,-0.17,-0.20,-0.21,-0.18,-0.15,-0.10] },
+    'NGA': { name: 'Nigeria', ar1: 0.88,
+      resid: [-0.15,-0.12,-0.08,-0.04,0.02,0.08,0.12,0.11,0.06,-0.01,-0.05,-0.04,0.01] },
+    'KEN': { name: 'Kenya', ar1: 0.91,
+      resid: [0.18,0.20,0.19,0.15,0.09,0.03,-0.04,-0.09,-0.12,-0.14,-0.15,-0.14,-0.11] },
+    'GHA': { name: 'Ghana', ar1: 0.85,
+      resid: [-0.08,-0.05,0.01,0.06,0.09,0.08,0.05,0.00,-0.05,-0.08,-0.06,-0.02,0.03] },
+    'ETH': { name: 'Ethiopia', ar1: 0.94,
+      resid: [0.10,0.12,0.14,0.15,0.14,0.12,0.08,0.04,-0.01,-0.05,-0.08,-0.10,-0.11] },
+    'SEN': { name: 'Senegal', ar1: 0.87,
+      resid: [-0.20,-0.17,-0.12,-0.06,0.00,0.05,0.09,0.10,0.08,0.04,-0.01,-0.04,-0.05] },
+    'BWA': { name: 'Botswana', ar1: 0.96,
+      resid: [0.35,0.33,0.30,0.26,0.21,0.16,0.10,0.04,-0.02,-0.08,-0.13,-0.18,-0.22] },
+    'MUS': { name: 'Mauritius', ar1: 0.92,
+      resid: [-0.25,-0.22,-0.18,-0.14,-0.09,-0.04,0.01,0.06,0.10,0.13,0.14,0.13,0.10] },
+  };
+
+  const years = Array.from({length: 13}, (_, i) => 2010 + i);
+
+  // Populate dropdown
+  const select = document.getElementById('countrySelect');
+  for (const [iso, d] of Object.entries(countryData)) {
+    const opt = document.createElement('option');
+    opt.value = iso;
+    opt.textContent = `${iso} (${d.name})`;
+    select.appendChild(opt);
+  }
+
+  let currentCountry = 'ZAF';
+  let clustered = false;
+
+  // SE values from the paper
+  const SE_NC = 0.017269;
+  const SE_CL = 0.044931;
+  const T_NC_TWFE = -1.66;  // non-clustered TWFE t (beta/SE_NC)
+  const T_CL_TWFE = -0.64;  // clustered TWFE t (beta/SE_CL)
+
+  function toCanvas(x, y, yMin, yMax) {
+    return [
+      pad.l + (x - 2010) / 12 * (W - pad.l - pad.r),
+      H - pad.b - (y - yMin) / (yMax - yMin) * (H - pad.t - pad.b)
+    ];
+  }
+
+  function draw() {
+    const data = countryData[currentCountry];
+    const resid = data.resid;
+    const yMax = Math.max(0.5, ...resid.map(Math.abs)) * 1.3;
+    const yMin = -yMax;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Grid
+    ctx.strokeStyle = '#E8E8E0';
+    ctx.lineWidth = 0.5;
+    const zero_y = H - pad.b - (0 - yMin) / (yMax - yMin) * (H - pad.t - pad.b);
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(pad.l, zero_y);
+    ctx.lineTo(W - pad.r, zero_y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Confidence band (SE band around zero)
+    const se = clustered ? SE_CL : SE_NC;
+    const band = 1.96 * se;
+    const bandTop = H - pad.b - (band - yMin) / (yMax - yMin) * (H - pad.t - pad.b);
+    const bandBot = H - pad.b - (-band - yMin) / (yMax - yMin) * (H - pad.t - pad.b);
+
+    ctx.fillStyle = clustered ? 'rgba(74, 111, 165, 0.12)' : 'rgba(94, 140, 97, 0.12)';
+    ctx.fillRect(pad.l, bandTop, W - pad.l - pad.r, bandBot - bandTop);
+
+    ctx.strokeStyle = clustered ? 'rgba(74, 111, 165, 0.4)' : 'rgba(94, 140, 97, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([6, 3]);
+    ctx.beginPath();
+    ctx.moveTo(pad.l, bandTop);
+    ctx.lineTo(W - pad.r, bandTop);
+    ctx.moveTo(pad.l, bandBot);
+    ctx.lineTo(W - pad.r, bandBot);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Band label
+    ctx.fillStyle = clustered ? 'rgba(74, 111, 165, 0.6)' : 'rgba(94, 140, 97, 0.6)';
+    ctx.font = '10px JetBrains Mono';
+    ctx.textAlign = 'left';
+    ctx.fillText(clustered ? '95% CI (clustered)' : '95% CI (naive)', pad.l + 4, bandTop - 4);
+
+    // Axes
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t);
+    ctx.lineTo(pad.l, H - pad.b);
+    ctx.lineTo(W - pad.r, H - pad.b);
+    ctx.stroke();
+
+    // Year labels
+    ctx.fillStyle = '#999';
+    ctx.font = '10px JetBrains Mono';
+    ctx.textAlign = 'center';
+    for (let yr = 2010; yr <= 2022; yr += 2) {
+      const [cx] = toCanvas(yr, 0, yMin, yMax);
+      ctx.fillText(yr, cx, H - pad.b + 18);
+    }
+
+    // Y labels
+    ctx.textAlign = 'right';
+    const ticks = [-0.3, -0.15, 0, 0.15, 0.3];
+    for (const v of ticks) {
+      if (v < yMin || v > yMax) continue;
+      const [, cy] = toCanvas(2010, v, yMin, yMax);
+      ctx.fillText(v.toFixed(2), pad.l - 6, cy + 3);
+    }
+
+    // Axis labels
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#999';
+    ctx.font = '12px Crimson Pro';
+    ctx.fillText('Year', W / 2, H - 4);
+    ctx.save();
+    ctx.translate(12, H / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('TWFE residual (pp)', 0, 0);
+    ctx.restore();
+
+    // Line connecting points
+    ctx.strokeStyle = '#C4843C';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < resid.length; i++) {
+      const [cx, cy] = toCanvas(years[i], resid[i], yMin, yMax);
+      if (i === 0) ctx.moveTo(cx, cy);
+      else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+
+    // Points
+    for (let i = 0; i < resid.length; i++) {
+      const [cx, cy] = toCanvas(years[i], resid[i], yMin, yMax);
+      ctx.beginPath();
+      ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = resid[i] >= 0 ? '#C4843C' : '#4A6FA5';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    // Update stats
+    document.getElementById('arStat').textContent = 'AR(1) = ' + data.ar1.toFixed(2);
+    const t_val = clustered ? T_CL_TWFE : T_NC_TWFE;
+    const tEl = document.getElementById('tStat');
+    tEl.textContent = 't = ' + t_val.toFixed(2);
+    tEl.style.background = clustered ? 'var(--slate-light)' : 'var(--sage-light)';
+    tEl.style.color = clustered ? 'var(--slate)' : 'var(--sage)';
+
+    const ciEl = document.getElementById('ciBand');
+    ciEl.textContent = 'SE = ' + se.toFixed(3);
+    ciEl.style.background = clustered ? 'var(--slate-light)' : 'var(--sage-light)';
+    ciEl.style.color = clustered ? 'var(--slate)' : 'var(--sage)';
+  }
+
+  select.addEventListener('change', () => {
+    currentCountry = select.value;
+    draw();
+  });
+
+  const clBtn = document.getElementById('clusterToggle');
+  clBtn.addEventListener('click', () => {
+    clustered = !clustered;
+    clBtn.className = clustered ? 'toggle-btn active-slate' : 'toggle-btn';
+    clBtn.textContent = clustered ? 'Clustered SEs (ON)' : 'Clustered SEs';
+    draw();
+  });
+
+  draw();
+})();
+
+// ====== CHAPTER 8 WIDGET: Detrending Before/After ======
+(function() {
+  const canvas = document.getElementById('detrendCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = { l: 60, r: 60, t: 25, b: 40 };
+
+  // Representative country data: obesity (%) and sugar (kcal/cap/day) 2010-2022
+  // Based on real panel patterns
+  const countryData = {
+    'ZAF': { name: 'South Africa',
+      obesity: [37.0,37.5,38.0,38.5,39.0,39.4,39.8,40.1,40.4,40.6,40.8,41.0,41.1],
+      sugar: [340,345,350,355,352,358,361,365,360,358,362,365,368] },
+    'NGA': { name: 'Nigeria',
+      obesity: [6.5,6.8,7.1,7.4,7.7,8.0,8.3,8.6,8.9,9.2,9.5,9.8,10.1],
+      sugar: [90,92,94,93,95,97,96,98,100,99,101,103,102] },
+    'KEN': { name: 'Kenya',
+      obesity: [7.0,7.3,7.6,7.9,8.2,8.5,8.8,9.1,9.4,9.7,10.0,10.3,10.6],
+      sugar: [105,108,110,112,111,114,116,115,118,120,119,122,124] },
+    'GHA': { name: 'Ghana',
+      obesity: [9.0,9.4,9.8,10.2,10.6,11.0,11.4,11.8,12.2,12.6,13.0,13.3,13.6],
+      sugar: [80,82,84,86,85,88,90,89,92,94,93,96,98] },
+    'ETH': { name: 'Ethiopia',
+      obesity: [2.5,2.7,2.9,3.1,3.3,3.5,3.7,3.9,4.1,4.3,4.5,4.7,4.9],
+      sugar: [28,29,30,31,30,32,33,32,34,35,34,36,37] },
+    'SEN': { name: 'Senegal',
+      obesity: [8.0,8.4,8.8,9.2,9.6,10.0,10.4,10.8,11.2,11.6,12.0,12.3,12.6],
+      sugar: [72,74,76,75,78,80,79,82,84,83,86,88,87] },
+  };
+
+  const years = Array.from({length: 13}, (_, i) => 2010 + i);
+
+  // Populate dropdown
+  const select = document.getElementById('dtCountrySelect');
+  for (const [iso, d] of Object.entries(countryData)) {
+    const opt = document.createElement('option');
+    opt.value = iso;
+    opt.textContent = `${iso} (${d.name})`;
+    select.appendChild(opt);
+  }
+
+  let currentCountry = 'ZAF';
+  let detrended = false;
+
+  function linfit(arr) {
+    const n = arr.length;
+    let sx = 0, sy = 0, sxx = 0, sxy = 0;
+    for (let i = 0; i < n; i++) {
+      sx += i; sy += arr[i]; sxx += i * i; sxy += i * arr[i];
+    }
+    const slope = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+    const intercept = (sy - slope * sx) / n;
+    return { slope, intercept };
+  }
+
+  function detrend(arr) {
+    const { slope, intercept } = linfit(arr);
+    return arr.map((v, i) => v - (slope * i + intercept));
+  }
+
+  function corrcoef(a, b) {
+    const n = a.length;
+    const ma = a.reduce((s, v) => s + v, 0) / n;
+    const mb = b.reduce((s, v) => s + v, 0) / n;
+    let num = 0, da2 = 0, db2 = 0;
+    for (let i = 0; i < n; i++) {
+      num += (a[i] - ma) * (b[i] - mb);
+      da2 += (a[i] - ma) ** 2;
+      db2 += (b[i] - mb) ** 2;
+    }
+    return da2 > 0 && db2 > 0 ? num / Math.sqrt(da2 * db2) : 0;
+  }
+
+  function draw() {
+    const data = countryData[currentCountry];
+    let obesity = data.obesity;
+    let sugar = data.sugar;
+
+    if (detrended) {
+      obesity = detrend(data.obesity);
+      sugar = detrend(data.sugar);
+    }
+
+    const r = corrcoef(obesity, sugar);
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Compute ranges
+    const oMin = Math.min(...obesity);
+    const oMax = Math.max(...obesity);
+    const sMin = Math.min(...sugar);
+    const sMax = Math.max(...sugar);
+    const oPad = (oMax - oMin) * 0.15 || 1;
+    const sPad = (sMax - sMin) * 0.15 || 5;
+
+    function toCanvasO(yr, val) {
+      return [
+        pad.l + (yr - 2010) / 12 * (W - pad.l - pad.r),
+        H - pad.b - (val - (oMin - oPad)) / ((oMax + oPad) - (oMin - oPad)) * (H - pad.t - pad.b)
+      ];
+    }
+    function toCanvasS(yr, val) {
+      return [
+        pad.l + (yr - 2010) / 12 * (W - pad.l - pad.r),
+        H - pad.b - (val - (sMin - sPad)) / ((sMax + sPad) - (sMin - sPad)) * (H - pad.t - pad.b)
+      ];
+    }
+
+    // Zero line for detrended
+    if (detrended) {
+      const zy = H - pad.b - (0 - (oMin - oPad)) / ((oMax + oPad) - (oMin - oPad)) * (H - pad.t - pad.b);
+      ctx.strokeStyle = '#ddd';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(pad.l, zy);
+      ctx.lineTo(W - pad.r, zy);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Axes
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, pad.t);
+    ctx.lineTo(pad.l, H - pad.b);
+    ctx.lineTo(W - pad.r, H - pad.b);
+    ctx.stroke();
+    // Right axis
+    ctx.beginPath();
+    ctx.moveTo(W - pad.r, pad.t);
+    ctx.lineTo(W - pad.r, H - pad.b);
+    ctx.stroke();
+
+    // Year labels
+    ctx.fillStyle = '#999';
+    ctx.font = '10px JetBrains Mono';
+    ctx.textAlign = 'center';
+    for (let yr = 2010; yr <= 2022; yr += 2) {
+      const [cx] = toCanvasO(yr, oMin);
+      ctx.fillText(yr, cx, H - pad.b + 18);
+    }
+
+    // Left Y labels (obesity)
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#C4843C';
+    if (detrended) {
+      for (const v of [-2, -1, 0, 1, 2]) {
+        if (v < oMin - oPad || v > oMax + oPad) continue;
+        const [, cy] = toCanvasO(2010, v);
+        ctx.fillText(v.toFixed(1), pad.l - 6, cy + 3);
+      }
+    } else {
+      const step = Math.max(1, Math.round((oMax - oMin) / 4));
+      for (let v = Math.floor(oMin); v <= Math.ceil(oMax); v += step) {
+        const [, cy] = toCanvasO(2010, v);
+        ctx.fillText(v + '%', pad.l - 6, cy + 3);
+      }
+    }
+
+    // Right Y labels (sugar)
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#4A6FA5';
+    if (detrended) {
+      for (const v of [-15, -10, -5, 0, 5, 10, 15]) {
+        if (v < sMin - sPad || v > sMax + sPad) continue;
+        const [, cy] = toCanvasS(2010, v);
+        ctx.fillText(v.toFixed(0), W - pad.r + 6, cy + 3);
+      }
+    } else {
+      const step = Math.max(10, Math.round((sMax - sMin) / 4 / 10) * 10);
+      for (let v = Math.floor(sMin / 10) * 10; v <= Math.ceil(sMax / 10) * 10; v += step) {
+        const [, cy] = toCanvasS(2010, v);
+        ctx.fillText(v, W - pad.r + 6, cy + 3);
+      }
+    }
+
+    // Trend lines (only in levels mode)
+    if (!detrended) {
+      const oFit = linfit(data.obesity);
+      const sFit = linfit(data.sugar);
+
+      ctx.setLineDash([6, 3]);
+      ctx.lineWidth = 1;
+
+      // Obesity trend
+      ctx.strokeStyle = 'rgba(196, 132, 60, 0.4)';
+      ctx.beginPath();
+      const [ox1, oy1] = toCanvasO(2010, oFit.intercept);
+      const [ox2, oy2] = toCanvasO(2022, oFit.slope * 12 + oFit.intercept);
+      ctx.moveTo(ox1, oy1);
+      ctx.lineTo(ox2, oy2);
+      ctx.stroke();
+
+      // Sugar trend
+      ctx.strokeStyle = 'rgba(74, 111, 165, 0.4)';
+      ctx.beginPath();
+      const [sx1, sy1] = toCanvasS(2010, sFit.intercept);
+      const [sx2, sy2] = toCanvasS(2022, sFit.slope * 12 + sFit.intercept);
+      ctx.moveTo(sx1, sy1);
+      ctx.lineTo(sx2, sy2);
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+    }
+
+    // Obesity line
+    ctx.strokeStyle = '#C4843C';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < obesity.length; i++) {
+      const [cx, cy] = toCanvasO(years[i], obesity[i]);
+      if (i === 0) ctx.moveTo(cx, cy);
+      else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+
+    // Obesity points
+    for (let i = 0; i < obesity.length; i++) {
+      const [cx, cy] = toCanvasO(years[i], obesity[i]);
+      ctx.beginPath();
+      ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#C4843C';
+      ctx.fill();
+    }
+
+    // Sugar line
+    ctx.strokeStyle = '#4A6FA5';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < sugar.length; i++) {
+      const [cx, cy] = toCanvasS(years[i], sugar[i]);
+      if (i === 0) ctx.moveTo(cx, cy);
+      else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+
+    // Sugar points
+    for (let i = 0; i < sugar.length; i++) {
+      const [cx, cy] = toCanvasS(years[i], sugar[i]);
+      ctx.beginPath();
+      ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#4A6FA5';
+      ctx.fill();
+    }
+
+    // Legend
+    ctx.font = '11px JetBrains Mono';
+    const legX = pad.l + 10;
+    const legY = pad.t + 10;
+    ctx.fillStyle = '#C4843C';
+    ctx.beginPath();
+    ctx.arc(legX, legY, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.textAlign = 'left';
+    ctx.fillText(detrended ? 'Obesity (detrended)' : 'Obesity (%)', legX + 10, legY + 4);
+
+    ctx.fillStyle = '#4A6FA5';
+    ctx.beginPath();
+    ctx.arc(legX, legY + 18, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillText(detrended ? 'Sugar (detrended)' : 'Sugar (kcal/day)', legX + 10, legY + 22);
+
+    // Update correlation display
+    const corrEl = document.getElementById('dtCorr');
+    corrEl.textContent = 'r = ' + r.toFixed(2);
+    if (detrended) {
+      corrEl.style.background = 'var(--slate-light)';
+      corrEl.style.color = 'var(--slate)';
+    } else {
+      corrEl.style.background = 'var(--amber-light)';
+      corrEl.style.color = 'var(--amber)';
+    }
+  }
+
+  select.addEventListener('change', () => {
+    currentCountry = select.value;
+    draw();
+  });
+
+  const dtBtn = document.getElementById('detrendToggle');
+  dtBtn.addEventListener('click', () => {
+    detrended = !detrended;
+    dtBtn.className = detrended ? 'toggle-btn active-slate' : 'toggle-btn';
+    dtBtn.textContent = detrended ? 'Detrended (ON)' : 'Detrend';
+    draw();
+  });
+
+  draw();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+Test,Statistic,Verdict
+Cross-sectional r,0.362,significant
+Country FE t_cl,2.09,significant
+TWFE t_cl,0.7,null
+Lead-lag ratio,0.99,co-trending
+Detrended t_cl,1.62,null
+First diff r,0.035,null
+Granger r,0.053,null
+Oster delta,17.6,misleading (co-trending)

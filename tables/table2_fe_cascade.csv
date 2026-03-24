@@ -1,0 +1,5 @@
+Specification,Sugar beta (pp/10kcal),Sugar SE,Sugar t,Sugar p,Oil beta (pp/100kcal),Oil SE,Oil t,Oil p,R2,N,Clustered SE
+OLS (cross-sectional),0.6301,0.0318,19.84,0.0,0.5078,0.3165,1.6,0.1092,0.4878,481,No
+Country FE,0.0345,0.1358,0.25,0.7995,0.1036,0.7909,0.13,0.8958,0.9574,481,Yes
+TWFE,-0.0287,0.0449,-0.64,0.5235,-0.3619,0.2576,-1.41,0.16,0.9945,481,Yes
+Detrended,-0.0008,0.006,-0.13,0.8963,-0.0393,0.0477,-0.83,0.4092,0.0066,481,Yes
