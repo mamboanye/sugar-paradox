@@ -1,0 +1,190 @@
+{
+  "question": "Do grand-total energy/fat/protein FAOSTAT features recreate the Eastern Europe TWFE comparator in the SSA panel?",
+  "features": [
+    {
+      "name": "total_energy_100kcal",
+      "item": "Grand Total",
+      "element": "Food supply (kcal/capita/day)",
+      "scale": 100.0,
+      "label": "Total energy supply (+100 kcal/cap/day)"
+    },
+    {
+      "name": "total_fat_10g",
+      "item": "Grand Total",
+      "element": "Fat supply quantity (g/capita/day)",
+      "scale": 10.0,
+      "label": "Total fat supply (+10 g/cap/day)"
+    },
+    {
+      "name": "total_protein_10g",
+      "item": "Grand Total",
+      "element": "Protein supply quantity (g/capita/day)",
+      "scale": 10.0,
+      "label": "Total protein supply (+10 g/cap/day)"
+    }
+  ],
+  "panel": {
+    "rows": 481,
+    "countries": 37,
+    "years": [
+      2010,
+      2022
+    ]
+  },
+  "models": {
+    "cross_section_controls::total_energy_100kcal": {
+      "beta": -0.14289762376693269,
+      "se": 0.524034354307189,
+      "t_cl": -0.2726875110236877,
+      "p": 0.7850934357682056,
+      "n_obs": 37,
+      "n_countries": 37,
+      "r2": 0.5325761546353889
+    },
+    "cross_section_controls::total_fat_10g": {
+      "beta": 0.7925380701249619,
+      "se": 0.9287088369670338,
+      "t_cl": 0.853376255913773,
+      "p": 0.393450684459534,
+      "n_obs": 37,
+      "n_countries": 37,
+      "r2": 0.5415718035733208
+    },
+    "cross_section_controls::total_protein_10g": {
+      "beta": -0.025977385357717552,
+      "se": 1.015567013266334,
+      "t_cl": -0.025579193709893516,
+      "p": 0.9795929816542113,
+      "n_obs": 37,
+      "n_countries": 37,
+      "r2": 0.5313559470590234
+    },
+    "twfe::total_energy_100kcal": {
+      "beta": -0.12589843633536327,
+      "se": 0.09545600956725758,
+      "t_cl": -1.318915769746861,
+      "p": 0.18719727346332093,
+      "n_obs": 481,
+      "n_countries": 37,
+      "r2": 0.9944496179020377
+    },
+    "twfe_gdp_urban::total_energy_100kcal": {
+      "beta": -0.09815560471165663,
+      "se": 0.09546982331079051,
+      "t_cl": -1.0281322548605005,
+      "p": 0.3038876199467837,
+      "n_obs": 481,
+      "n_countries": 37,
+      "r2": 0.994747244572026
+    },
+    "twfe::total_fat_10g": {
+      "beta": -0.33301448560916425,
+      "se": 0.20963331064164875,
+      "t_cl": -1.5885571075983513,
+      "p": 0.11216041838069346,
+      "n_obs": 481,
+      "n_countries": 37,
+      "r2": 0.9945397672927362
+    },
+    "twfe_gdp_urban::total_fat_10g": {
+      "beta": -0.26727744512277984,
+      "se": 0.18571508896884206,
+      "t_cl": -1.4391800182031613,
+      "p": 0.15009952525286807,
+      "n_obs": 481,
+      "n_countries": 37,
+      "r2": 0.9948169510995049
+    },
+    "twfe::total_protein_10g": {
+      "beta": -0.21063146564384755,
+      "se": 0.2710080301561398,
+      "t_cl": -0.7772148505064348,
+      "p": 0.43703202204213243,
+      "n_obs": 481,
+      "n_countries": 37,
+      "r2": 0.994357590137427
+    },
+    "twfe_gdp_urban::total_protein_10g": {
+      "beta": -0.051239297058431665,
+      "se": 0.2776005491605904,
+      "t_cl": -0.1845792352117791,
+      "p": 0.853559073975646,
+      "n_obs": 481,
+      "n_countries": 37,
+      "r2": 0.9946784293814507
+    },
+    "country_detrended::total_energy_100kcal": {
+      "beta": 0.046750154596290956,
+      "se": 0.015713568922840624,
+      "t_cl": 2.9751455462378615,
+      "p": 0.0029284956595274636,
+      "n_obs": 481,
+      "n_countries": 37,
+      "r2": 0.046715473194850254
+    },
+    "first_difference::total_energy_100kcal": {
+      "beta": -0.009896762044113142,
+      "se": 0.01748350724546675,
+      "t_cl": -0.5660627415977562,
+      "p": 0.571351130078193,
+      "n_obs": 444,
+      "n_countries": 37,
+      "r2": 0.000788076543919658
+    },
+    "country_detrended::total_fat_10g": {
+      "beta": -0.024253613149580484,
+      "se": 0.037714128968543065,
+      "t_cl": -0.6430909002249569,
+      "p": 0.52016511876318,
+      "n_obs": 481,
+      "n_countries": 37,
+      "r2": 0.0037568167242902906
+    },
+    "first_difference::total_fat_10g": {
+      "beta": -0.02280715785541398,
+      "se": 0.023106899149543093,
+      "t_cl": -0.9870280606588859,
+      "p": 0.32362888254630273,
+      "n_obs": 444,
+      "n_countries": 37,
+      "r2": 0.001556186037183327
+    },
+    "country_detrended::total_protein_10g": {
+      "beta": 0.07289042561061009,
+      "se": 0.048574751198889356,
+      "t_cl": 1.500582582752924,
+      "p": 0.13346355903009943,
+      "n_obs": 481,
+      "n_countries": 37,
+      "r2": 0.01607085672559272
+    },
+    "first_difference::total_protein_10g": {
+      "beta": -0.00624585626007732,
+      "se": 0.03506671065459942,
+      "t_cl": -0.17811354824801914,
+      "p": 0.8586338021984592,
+      "n_obs": 444,
+      "n_countries": 37,
+      "r2": 4.663386478065412e-05
+    }
+  },
+  "summary": {
+    "n_tests": 15,
+    "n_p_lt_0_05": 1,
+    "twfe_energy": [
+      {
+        "model": "twfe",
+        "feature": "total_energy_100kcal",
+        "feature_label": "Total energy supply (+100 kcal/cap/day)",
+        "beta": -0.12589843633536327,
+        "se": 0.09545600956725758,
+        "t_cl": -1.318915769746861,
+        "p": 0.18719727346332093,
+        "n_obs": 481,
+        "n_countries": 37,
+        "r2": 0.9944496179020377
+      }
+    ],
+    "interpretation_guardrail": "This is an SSA comparator against a regional Eastern Europe result; it tests aggregate energy/macronutrients, not individual diet or fiber intake."
+  }
+}

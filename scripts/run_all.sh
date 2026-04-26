@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# run_all.sh -- Execute the full Sugar Paradox paper2 pipeline.
+# run_all.sh -- Execute the full Sugar Paradox pipeline.
 #
 # Usage:
-#   cd workspace/paper2/scripts
+#   cd scripts
 #   bash run_all.sh
 #
 # Each script runs with uv and prints key results to stdout.
@@ -33,7 +33,9 @@ for script in \
     09_figures.py \
     10_tables.py \
     11_diabetes_cascade.py \
-    12_inference_robustness.py; do
+    12_inference_robustness.py \
+    13_eastern_europe_comparator.py \
+    14_energy_surprise_probe.py; do
     echo ""
     echo ">>> Running $script"
     $UV_RUN python "$script"

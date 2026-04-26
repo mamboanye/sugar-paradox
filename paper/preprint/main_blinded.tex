@@ -27,7 +27,7 @@ The association survives every cross-sectional stress test: leave-one-out exclus
 
 It does not survive following the same countries over time.
 In a 2010--2022 panel, sugar supply is null within countries under six specifications---fixed effects, two-way fixed effects, detrending, first differences, long differences, and correlated random effects---each removing a different class of confounding, all converging on the same answer.
-The null is not about sugar. None of 10 FAOSTAT food groups predicts within-country obesity change. Entity and year fixed effects absorb 99.4\% of obesity variance, leaving 0.6\% for any food variable to explain.
+The null is not about sugar. None of 10 FAOSTAT food groups predicts within-country obesity change. A targeted grand-total energy, fat, and protein comparator reaches the same boundary under two-way fixed effects and first differences. Entity and year fixed effects absorb 99.4\% of obesity variance, leaving 0.6\% for any food variable to explain.
 
 Standard safeguards do not catch this. A soybean oil case study passes cross-sectional tests, one-way fixed effects, and Oster bounds ($\delta = 17.6$), yet its lead-lag ratio is 0.99---pure co-trending with no temporal direction. The problem is global: 98\% of 200 countries show linear obesity trends ($R^2 \geq 0.90$).
 
@@ -44,7 +44,7 @@ Countries that consume more sugar are fatter. Plot national sugar supply against
 
 This paper shows that the association is entirely misleading. When we follow the same 37 countries over 13 years, tracking whether rising or falling sugar supply corresponds to faster or slower obesity growth, the association vanishes. Country fixed effects reduce the sugar coefficient to $t = 0.25$. Adding year effects drops it to $t = -0.64$. Detrending each country's individual trajectory gives $t = -0.13$. Three further approaches confirm the null: first differences ($r = -0.03$), long differences over the full decade ($r = -0.19$), and a Mundlak correlated random effects model ($t = -0.66$). Six specifications, each removing a different class of confounding, converge on the same answer: no signal.
 
-The explanation is structural. Obesity has risen along near-linear trajectories in virtually every country over the past decade, and these trajectories have little to do with food supply. Entity and year fixed effects together absorb 99.4\% of obesity variance in our panel. Food supply variables compete for the remaining 0.6\%, a residual space dominated by measurement error and short-run noise. None of the 10 FAOSTAT food groups we test predicts within-country obesity. The null is not specific to sugar.
+The explanation is structural. Obesity has risen along near-linear trajectories in virtually every country over the past decade, and these trajectories have little to do with food supply. Entity and year fixed effects together absorb 99.4\% of obesity variance in our panel. Food supply variables compete for the remaining 0.6\%, a residual space dominated by measurement error and short-run noise. None of the 10 FAOSTAT food groups we test predicts within-country obesity. A targeted grand-total energy, fat, and protein comparator reaches the same boundary under two-way fixed effects and first differences. The null is not specific to sugar.
 
 The mechanism is not subtle. Cross-sectional studies compare countries at a point in time, and such comparisons conflate persistent between-country differences with the shared upward trend in obesity. A correlated random effects decomposition confirms this: the between-country sugar coefficient is $t = 3.46$ while the within-country coefficient is $t = -0.66$. The entire association is between-country. A soybean oil case study makes the mechanism concrete. Soybean oil supply passes the same cross-sectional and one-way fixed-effects tests that sugar passes, yet its lead-lag ratio is 0.99: pure co-trending with no temporal direction.
 
@@ -65,7 +65,7 @@ The paper proceeds as follows. Section 2 describes the data. Section 3 documents
 
 We construct a country-year-sex panel for 37 Sub-Saharan African countries from 2010 through 2022, combining three data sources.
 
-\paragraph{Food supply} FAOSTAT Food Balance Sheets \citep{faostat2024} provide national food supply in kilocalories per capita per day for 10 food groups: cereals, sugar \& sweeteners, vegetable oils, meat, milk, fruits, vegetables, starchy roots, pulses, and animal fats. The primary exposure variable is sugar \& sweeteners supply (mean 164 kcal/cap/day, SD 107). We also examine vegetable oils (mean 233, SD 108) and all remaining food groups in robustness analyses. Soybean oil supply, used in the case study of Section 4, comes from the same FAOSTAT release.
+\paragraph{Food supply} FAOSTAT Food Balance Sheets \citep{faostat2024} provide national food supply in kilocalories per capita per day for 10 food groups: cereals, sugar \& sweeteners, vegetable oils, meat, milk, fruits, vegetables, starchy roots, pulses, and animal fats. The primary exposure variable is sugar \& sweeteners supply (mean 164 kcal/cap/day, SD 107). We also examine vegetable oils (mean 233, SD 108) and all remaining food groups in robustness analyses. For the aggregate-energy comparator, we extract FAOSTAT grand-total energy, fat, and protein supply from the same release. Soybean oil supply, used in the case study of Section 4, also comes from this release.
 
 \paragraph{Health outcomes} NCD-RisC Lancet 2024 estimates \citep{ncdrisc2024bmi} provide age-standardized adult obesity prevalence (BMI $\geq$ 30) for each country-year-sex cell. Women's mean obesity prevalence is 17.1\% (SD 10.0); men's is 6.2\%. We also examine diabetes prevalence from the companion NCD-RisC release \citep{ncdrisc2024diabetes} (women's mean 10.1\%, men's 9.2\%). These estimates come from a Bayesian hierarchical model that pools population-representative surveys, producing smooth temporal trajectories that we return to in Section 4.
 
@@ -157,6 +157,25 @@ Figure~\ref{fig:fe_cascade} visualizes the specification cascade.
 \subsection{Generality Beyond Sugar}
 
 The null is not specific to sugar. We tested all 10 FAOSTAT food groups under four specifications: cross-sectional correlation, one-way country fixed effects, two-way fixed effects, and first differences. Six of 10 food groups show significant cross-sectional associations with obesity. Two of 10 remain significant under one-way country fixed effects (meat at $t = 3.05$ and vegetables at $t = 4.13$). Zero of 10 survive two-way fixed effects. Zero of 10 survive first differences. Sugar, meat, milk, and several other food groups look strong in cross-country comparisons, but that signal disappears once shared trends are removed. In this panel, no food-supply variable shows a stable within-country association with obesity.
+
+Recent FAOSTAT-based obesity studies emphasize aggregate energy and nutrient supply rather than individual food groups \citep{siminiuc2025,delgadopertinez2026}. We therefore ran a targeted comparator on grand-total energy, fat, and protein supply. Table~\ref{tab:energy_comparator} shows the same boundary. Total energy is null under two-way fixed effects ($t = -1.32$, $p = 0.19$) and remains null after adding GDP and urban controls ($t = -1.03$, $p = 0.30$). First differences are also null ($t = -0.57$, $p = 0.57$). Fat and protein are null across the same checks. A simple country-linear detrended energy residual is positive ($t = 2.98$, $p = 0.003$). But it weakens after adding year fixed effects ($t = 1.74$, $p = 0.08$), and both lagged and lead energy residuals carry signal (lag $t = 2.98$, lead $t = 2.19$). That pattern is residual co-movement, not directional evidence that national energy supply explains obesity change.
+
+\begin{table}[htbp]
+\centering
+\caption{Grand-total FAOSTAT comparator against total energy and macronutrients. Entries are country-clustered $t$-statistics for women's obesity prevalence. TWFE + controls includes GDP per capita and urban population share.}
+\label{tab:energy_comparator}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Feature & TWFE & TWFE + controls & Detrended & First diff. \\
+\midrule
+Total energy (+100 kcal/cap/day) & $-1.32$ & $-1.03$ & $2.98^{**}$ & $-0.57$ \\
+Total fat (+10 g/cap/day) & $-1.59$ & $-1.44$ & $-0.64$ & $-0.99$ \\
+Total protein (+10 g/cap/day) & $-0.78$ & $-0.18$ & $1.50$ & $-0.18$ \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize $^{**}p < 0.01$. Detrended removes a country-specific linear trend only.}
+\end{tabular}
+\end{table}
 
 This uniformity points to a structural explanation. Entity and year fixed effects absorb 99.4\% of obesity variance. The residual 0.6\% is too small and too noisy for any food supply variable to predict, regardless of whether that variable has a genuine causal relationship with obesity at the individual level.
 
@@ -287,7 +306,7 @@ The sign reversal is meaningful. Cross-sectionally, richer countries have higher
 
 \begin{figure}[htbp]
 \includegraphics[width=\textwidth]{../../figures/fig5_gdp_control.png}
-\caption{GDP per capita as positive control. Cross-sectional: $r = 0.73$ (positive). Detrended: $r = -0.35$, $t_{\text{cl}} = -4.12$ (negative). The sign reversal confirms the method detects real within-country associations. Food supply variables show nothing at any specification.}
+\caption{GDP per capita as positive control. Cross-sectional: $r = 0.73$ (positive). Detrended: $r = -0.35$, $t_{\text{cl}} = -4.12$ (negative). The sign reversal confirms the method detects real within-country associations. Sugar and the FAOSTAT food-group variables show no comparable signal.}
 \label{fig:gdp_control}
 \end{figure}
 
@@ -337,7 +356,7 @@ South Africa's sugar-sweetened beverage tax, implemented in April 2018, illustra
 
 The Global Burden of Disease study estimates diet-attributable deaths using intake data that faces the same structural problem \citep{gbd2019}. GBD dietary risk estimates combine survey data with food supply proxies and model-based extrapolation. To the extent that these estimates rely on cross-country variation in food supply to calibrate risk, they inherit the confounding structure we document. Risk attributed to specific food categories based on national supply data should be interpreted with caution.
 
-The failure of food supply data to predict within-country obesity also says something about FAOSTAT as a health research instrument. Food Balance Sheets measure national availability at the supply level: production plus imports minus exports minus non-food uses, divided by population. They do not capture distribution within countries, food waste, processing, or actual dietary intake. \citet{delgobbo2015} compared FAO supply estimates to individual-level dietary surveys across 113 countries and found that FAO data overestimates intake by 50--270\% for most food groups. \citet{vonderschmidt2024} showed that FAOSTAT's 2014 methodology revision creates discontinuities that can reverse apparent trends in food supply series, a problem for any study combining pre- and post-revision data. The gap between supply-level availability and individual consumption may be large enough to obscure genuine diet-disease relationships, even if such relationships exist at the individual level. Cross-national ecological studies using other food classification systems face the same problem: \citet{monteiro2018} found that ultra-processed food availability predicted obesity across 19 European countries, a design that cannot separate co-trending from causation. This is not a reason to discard FAOSTAT data for health research. It is a reason to be precise about what cross-national food supply comparisons can and cannot identify.
+The failure of food supply data to predict within-country obesity also says something about FAOSTAT as a health research instrument. Food Balance Sheets measure national availability at the supply level: production plus imports minus exports minus non-food uses, divided by population. They do not capture distribution within countries, food waste, processing, or actual dietary intake. \citet{delgobbo2015} compared FAO supply estimates to individual-level dietary surveys across 113 countries and found that FAO data overestimates intake by 50--270\% for most food groups. \citet{vonderschmidt2024} showed that FAOSTAT's 2014 methodology revision creates discontinuities that can reverse apparent trends in food supply series, a problem for any study combining pre- and post-revision data. The gap between supply-level availability and individual consumption may be large enough to obscure genuine diet-disease relationships, even if such relationships exist at the individual level. Recent FAOSTAT-based studies extend the same design to total energy and nutritive-value supplies \citep{siminiuc2025,delgadopertinez2026}; our comparator shows that aggregate energy and macronutrient totals do not escape the trend problem in SSA. Cross-national ecological studies using other food classification systems face the same problem: \citet{monteiro2018} found that ultra-processed food availability predicted obesity across 19 European countries, a design that cannot separate co-trending from causation. This is not a reason to discard FAOSTAT data for health research. It is a reason to be precise about what cross-national food supply comparisons can and cannot identify.
 
 \subsection{Better Identification Strategies}
 

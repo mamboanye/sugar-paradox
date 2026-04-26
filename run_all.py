@@ -26,6 +26,8 @@ SCRIPTS = [
     "10_tables.py",
     "11_diabetes_cascade.py",
     "12_inference_robustness.py",
+    "13_eastern_europe_comparator.py",
+    "14_energy_surprise_probe.py",
 ]
 
 UV_DEPS = ["pandas", "statsmodels", "scipy", "matplotlib"]

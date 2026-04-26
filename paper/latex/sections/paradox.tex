@@ -55,6 +55,25 @@ Figure~\ref{fig:fe_cascade} visualizes the specification cascade.
 
 The null is not specific to sugar. We tested all 10 FAOSTAT food groups under four specifications: cross-sectional correlation, one-way country fixed effects, two-way fixed effects, and first differences. Six of 10 food groups show significant cross-sectional associations with obesity. Two of 10 remain significant under one-way country fixed effects (meat at $t = 3.05$ and vegetables at $t = 4.13$). Zero of 10 survive two-way fixed effects. Zero of 10 survive first differences. Sugar, meat, milk, and several other food groups look strong in cross-country comparisons, but that signal disappears once shared trends are removed. In this panel, no food-supply variable shows a stable within-country association with obesity.
 
+Recent FAOSTAT-based obesity studies emphasize aggregate energy and nutrient supply rather than individual food groups \cite{siminiuc2025,delgadopertinez2026}. We therefore ran a targeted comparator on grand-total energy, fat, and protein supply. Table~\ref{tab:energy_comparator} shows the same boundary. Total energy is null under two-way fixed effects ($t = -1.32$, $p = 0.19$) and remains null after adding GDP and urban controls ($t = -1.03$, $p = 0.30$). First differences are also null ($t = -0.57$, $p = 0.57$). Fat and protein are null across the same checks. A simple country-linear detrended energy residual is positive ($t = 2.98$, $p = 0.003$). But it weakens after adding year fixed effects ($t = 1.74$, $p = 0.08$), and both lagged and lead energy residuals carry signal (lag $t = 2.98$, lead $t = 2.19$). That pattern is residual co-movement, not directional evidence that national energy supply explains obesity change.
+
+\begin{table}[htbp]
+\centering
+\caption{Grand-total FAOSTAT comparator against total energy and macronutrients. Entries are country-clustered $t$-statistics for women's obesity prevalence. TWFE + controls includes GDP per capita and urban population share.}
+\label{tab:energy_comparator}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Feature & TWFE & TWFE + controls & Detrended & First diff. \\
+\midrule
+Total energy (+100 kcal/cap/day) & $-1.32$ & $-1.03$ & $2.98^{**}$ & $-0.57$ \\
+Total fat (+10 g/cap/day) & $-1.59$ & $-1.44$ & $-0.64$ & $-0.99$ \\
+Total protein (+10 g/cap/day) & $-0.78$ & $-0.18$ & $1.50$ & $-0.18$ \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize $^{**}p < 0.01$. Detrended removes a country-specific linear trend only.}
+\end{tabular}
+\end{table}
+
 This uniformity points to a structural explanation. Entity and year fixed effects absorb 99.4\% of obesity variance. The residual 0.6\% is too small and too noisy for any food supply variable to predict, regardless of whether that variable has a genuine causal relationship with obesity at the individual level.
 
 \subsection{Diabetes: The Borderline Case}
