@@ -31,7 +31,7 @@ The NCD-RisC obesity estimates come from a Bayesian hierarchical model that pool
 
 This smoothing has two consequences. First, it compresses within-country variation. Annual deviations from trend are smaller in the NCD-RisC estimates than they would be in raw survey data, reducing the signal available for within-country regression. Second, partial pooling means each country's estimate borrows information from regional neighbors, potentially introducing spatial correlation absent from the underlying data.
 
-We note this as a limitation rather than a correction. NCD-RisC data are the standard outcome measure in global obesity research; any finding using these data faces the same constraint. The relevant question is whether our null reflects genuine absence of association or insufficient variation after smoothing. The consistency of the null across six specifications argues for the former. Long differences, which compare only the 2010 and 2020 endpoints and do not depend on year-to-year variation, yield $r = -0.19$ (null). If sugar supply had a real within-country effect large enough to matter for policy, it should survive at least one of these approaches.
+Long differences provide the direct audit for this limitation. They compare the 2010 and 2020 endpoints and bypass the annual deviations most affected by smoothing; they still place sugar near zero ($r = -0.19$). The same boundary appears across fixed effects, two-way fixed effects, detrending, first differences, long differences, and correlated random effects. NCD-RisC smoothing therefore remains a limitation on the outcome data, not a sufficient explanation for the result. If sugar supply had a within-country effect large enough to matter for policy, at least one of these approaches should detect it.
 
 \subsection{The Soybean Oil Case Study}
 
@@ -64,7 +64,7 @@ Six tests tell a different story. Two-way fixed effects reduce the coefficient t
 
 The Oster bounds $\delta$ illustrates a separate failure mode. Oster's method \cite{oster2019} asks how large unobserved confounding would need to be, relative to observed confounding, to explain away a coefficient. Soybean oil's $\delta = 17.6$ would normally indicate strong robustness to confounding. Here it is misleading: the $R^2$ jump from bivariate (0.12) to country FE (0.96) comes from fixed effects absorbing level differences, not from soybean oil genuinely predicting obesity. The $\delta$ is high because the wrong variation is being compared.
 
-The case study matters because it is not an analogy. Soybean oil passes the same tests sugar passes: significant cross-sectional correlation, significant one-way FE, large Oster $\delta$. The tests that distinguish co-trending from causation (two-way FE, detrending, first differences, lead-lag, Granger) all reject. Standard approaches to food-supply-obesity association cannot distinguish co-trending from causal relationships.
+The case study matters because it uses the same empirical surface as the sugar result. Soybean oil passes the same tests sugar passes: significant cross-sectional correlation, significant one-way FE, large Oster $\delta$. Trend-removal diagnostics then separate the signal from causal timing: two-way FE, detrending, first differences, lead-lag, and Granger tests all reject. Standard food-supply-obesity designs that stop before these diagnostics treat co-trending as association.
 
 \begin{figure}[htbp]
 \centering
